@@ -1,0 +1,2 @@
+- om1 & om2 sont calibrés pour le programme "pendule_double_adim"
+- ils doivent être multipliés par sqrt(g/l1) pour le programme classique
