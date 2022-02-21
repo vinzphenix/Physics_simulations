@@ -2,8 +2,8 @@ import os
 from dateutil import parser
 
 
-#path = "C:/Users/vince/Documents/Animations/Atwood's machine/Atwood_om_dr_4.415_6.010_frames"
-#path = "C:/Users/vince/Documents/Animations/Atwood's machine/Atwood_om_dr_4.419_6.014_frames"
+#path = "C:/Users/vince/Documents/Animations/Atwood_machine/Atwood_om_dr_4.415_6.010_frames"
+#path = "C:/Users/vince/Documents/Animations/Atwood_machine/Atwood_om_dr_4.419_6.014_frames"
 #path = "C:/Users/vince/Documents/Animations_Videos/Pendule_Elastique_Video/X_Y_50_100_frames/"
 
 fileName = "Pdl_Horizontal"

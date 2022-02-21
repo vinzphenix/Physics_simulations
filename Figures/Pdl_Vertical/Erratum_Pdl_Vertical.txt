@@ -1,4 +1,0 @@
-x : m
-dx : m/s
-phi : deg
-om : rad/s
