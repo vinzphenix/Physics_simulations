@@ -8,8 +8,9 @@ from scipy.integrate import odeint
 from timeit import default_timer as timer
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 14
 
 ########################################################################################################
 
@@ -27,7 +28,7 @@ D2 = 0.0
 
 th00 = 170               # angle initial pendule
 om00 = 0.00               # vitesse angulaire initiale pendule
-x0  = 180.00               # position initiale roue
+x0  = 0.00               # position initiale roue
 v0  = 1.00                # vitesse initiale roue
 
 Tend = 27.9                 # [s]    -  fin de la simulation
@@ -87,20 +88,24 @@ L_X, L_Y = xmax - xmin, ymax - ymin
 
 #####     ================      Animation du Système      ================      #####
 
-def see_animation(save=False):
+def see_animation(save=""):
+    global ratio
+    if save == "snapshot":
+        ratio = 1
+        plt.rcParams['text.usetex'] = True
 
     #####     ================      Création de la figure      ================      #####
 
-    fig = plt.figure(figsize=(16, 9))
+    fig = plt.figure(figsize=(14, 8))
     ax = fig.add_subplot(211, xlim=(xmin, xmax), ylim=(ymin, ymax), aspect='equal')
     ax2 = fig.add_subplot(223)
     ax2.grid(ls=':')
     ax.grid(ls=':')
     ax3 = fig.add_subplot(224)
     ax3.grid(ls=':')
-    ax2.set_xlabel(r'$\theta \: \rm [rad]$', fontsize=14)
-    ax2.set_ylabel(r'$v \: \rm [m/s]$', fontsize=14)
-    ax3.set_xlabel(r'$\omega \: \rm [rad/s]$', fontsize=14)  # ; ax3.set_ylabel(r'$v \: \rm [m/s]$')
+    ax2.set_xlabel(r'$\theta \: \rm [rad]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$v \: \rm [m/s]$', fontsize=ftSz2)
+    ax3.set_xlabel(r'$\omega \: \rm [rad/s]$', fontsize=ftSz2)  # ; ax3.set_ylabel(r'$v \: \rm [m/s]$')
 
     line1, = ax.plot([], [], 'o-', lw=2, color='grey')
     line2, = ax.plot([], [], 'o-', lw=2, color='orange')
@@ -110,25 +115,25 @@ def see_animation(save=False):
     xd = arange(xmin, xmax, 0.01)
     ax.plot(xd, yc[0] - R / cos(a) - tan(a) * (xd - xc[0]))
 
-    time_template = r'$t = %.1fs$'
-    time_text = ax.text(0.45, 0.88, '', fontsize=15, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.45, 0.88, '', fontsize=ftSz2, transform=ax.transAxes)
     sector = patches.Wedge((xmax - L_X * 0.03, ymax - 0.03 * L_X),
                            L_X * 0.02, theta1=90, theta2=90, color='lightgrey')
 
     circ = patches.Circle((xc[0], yc[0]), radius=R, edgecolor=None, facecolor='lightgrey', lw=4)
 
-    ax.text(0.02, 0.06, r'$\alpha  = {:.2f} \: \rm [^\circ] $'.format(a0), fontsize=12, wrap=True,
+    ax.text(0.02, 0.06, r'$\alpha  = {:.2f} \: \rm [^\circ] $'.format(a0), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.02, 0.14, r'$\tau  = {:.2f} \: \rm [N \cdot m]$'.format(abs(C)), fontsize=12, wrap=True,
+    ax.text(0.02, 0.14, r'$\tau  = {:.2f} \: \rm [N \cdot m]$'.format(abs(C)), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.15, 0.06, r'$M  = {:.2f} \: \rm [kg]$'.format(M), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.15, 0.14, r'$m  = {:.2f} \: \rm [kg]$'.format(m), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.28, 0.06, r'$L  = {:.2f} \: \rm [m]$'.format(L), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.28, 0.14, r'$R  = {:.2f} \: \rm [m]$'.format(R), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.72, 0.92, r'$\theta  = {:.2f} $'.format(th00), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.72, 0.84, r'$\omega  = {:.2f} $'.format(om00), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.80, 0.92, r'$x  = {:.2f} $'.format(x0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.80, 0.84, r'$v  = {:.2f} $'.format(v0), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.15, 0.06, r'$M  = {:.2f} \: \rm [kg]$'.format(M), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.15, 0.14, r'$m  = {:.2f} \: \rm [kg]$'.format(m), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.28, 0.06, r'$L  = {:.2f} \: \rm [m]$'.format(L), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.28, 0.14, r'$R  = {:.2f} \: \rm [m]$'.format(R), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.72, 0.92, r'$\theta_0  = {:.2f} $'.format(th00), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.72, 0.84, r'$\omega_0  = {:.2f} $'.format(om00), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.80, 0.92, r'$x_0  = {:.2f} $'.format(x0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.80, 0.84, r'$v_0  = {:.2f} $'.format(v0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
     ax2.plot(th, v, color='C1')
     #ax2.plot(om, v, color='C1')
@@ -146,7 +151,7 @@ def see_animation(save=False):
         sector.set_theta1(90)
         return line1, line2, time_text, circ, sector, phase21, phase31
 
-    def animate(i):
+    def update(i):
         i *= ratio
 
         thisx1, thisx2 = [x1[i], xc[i], x3[i]], [xc[i], x2[i]]
@@ -160,19 +165,23 @@ def see_animation(save=False):
         circ.center = (xc[i], yc[i])
         ax.add_patch(circ)
 
-        time_text.set_text(time_template % (t[i+ratio-1]))
+        time_text.set_text(time_template.format(t[i+ratio-1]))
         sector.set_theta1(90-360*t[i+ratio-1]/Tend)
         ax.add_patch(sector)
 
         return line1, line2, time_text, circ, sector, phase21, phase31
 
-    anim = FuncAnimation(fig, animate, n // ratio,
-                         interval=10, blit=True, init_func=init, repeat_delay=3000)
+    anim = FuncAnimation(fig, update, n // ratio, interval=10, blit=True, init_func=init, repeat_delay=3000)
 
-    plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
+    # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
+    plt.tight_layout()
 
-    if save:
+    if save == "save":
         anim.save('Cylinder_Fall_2.html', fps=30)
+    elif save == "snapshot":
+        update(int(10. * n / Tend))
+        fig.savefig("./cylinder.svg", format="svg", bbox_inches="tight")
+        # plt.show()
     else:
         print(th0)
         plt.show()
@@ -211,4 +220,4 @@ parameters[2] = r"Axe c : $\vartheta$"
 #see_path_1(2, array([om*x, v*x]), th, color='Blues', shift=(0.15, -0.15),
 #           var_case=2, save="no", displayedInfo=parameters)
 
-see_animation(save=False)
+see_animation(save="")

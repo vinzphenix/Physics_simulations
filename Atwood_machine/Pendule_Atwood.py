@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -9,8 +8,9 @@ from scipy.integrate import odeint
 from time import perf_counter
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 14
 
 
 ########################################################################################################
@@ -21,13 +21,13 @@ g = 9.81                  # accélération de pesanteur
 M = 3.51                   # grosse masse
 m = 1.0                   # petite masse
 
-r0  = 1                  # position initiale  -  [m]
+r0  = 1                    # position initiale  -  [m]
 dr0 = 0.0                  # vitesse initiale   -  [m/s]
 th0 = 150                  # angle initial      -  [°]
 om0 = 0.0                  # vitesse angulaire  -  [rad/s]
 
 #Tend = 25.7 + (13. + 3.11)*5
-Tend = 500.
+Tend = 50.
 fps = 30
 n = int(500 * Tend)
 ratio = n // (int(Tend * fps))
@@ -120,34 +120,42 @@ if abs(amin(y2)) < L_X:
 #####     ================      Animation du Système      ================      #####
 
 
-def see_animation(save=False):
+def see_animation(save=""):
+    global ratio
+    if save == "snapshot":
+        ratio = 1
+        plt.rcParams['text.usetex'] = True
 
-    fig = plt.figure(figsize=(16, 9))
-    ax = fig.add_subplot(121, autoscale_on=False, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect='equal')
-    ax2 = fig.add_subplot(122)
+    fig, axs = plt.subplots(1, 2, figsize=(14., 7.))  # , constrained_layout=True)
+    ax, ax2 = axs[0], axs[1]
+
+    # ax = fig.add_subplot(121, autoscale_on=False, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect='equal')
+    # ax2 = fig.add_subplot(122)
+    ax.axis([x_m, x_M, y_m, y_M])
+    ax.set_aspect("equal")
     ax.grid(ls=':')
     ax2.grid(ls=':')
-    ax2.set_xlabel(r'$\theta \: \rm [rad]$')
-    ax2.set_ylabel(r'$\omega \: \rm [m/s]$')
+    ax2.set_xlabel(r'$\theta \;\; \rm [rad]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$\omega \;\; \rm [m/s]$', fontsize=ftSz2)
 
-    line,  = ax.plot([], [], 'o-', lw=2, color='C1')
+    line,  = ax.plot([], [], 'o-', lw=2.5, color='C1', zorder=10)
     line2, = ax.plot([], [], '-', lw=1, color='grey')
     phase1, = ax2.plot([], [], marker='o', ms=8, color='C0')
-    phase2, = ax2.plot([], [], marker='o', ms=8, color='C1')
+    phase2, = ax2.plot([], [], marker='o', ms=8, color='C1', alpha=0.)
 
-    time_template = r'$t = %.1fs$'
-    time_text = ax.text(0.42, 0.94, '', fontsize=15, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.40, 0.94, '', fontsize=ftSz2, transform=ax.transAxes)
     sector = patches.Wedge((x_M - L_X/10, x_m + L_X/10), L_X/20, theta1=90, theta2=90, color='lightgrey')
 
-    ax.text(0.04, 0.94, r'$\mu  = {:.2f}$'.format(M/m), fontsize=15, wrap=True, transform=ax.transAxes)
+    ax.text(0.04, 0.94, r'$\mu  = {:.2f}$'.format(M/m), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.72, 0.96, r'$r  = {:.2f} $'.format(r0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.72, 0.92, r'$dr  = {:.2f} $'.format(dr0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.87, 0.96, r'$\theta  = {:.2f} $'.format(degrees(th0)), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.87, 0.92, r'$\omega  = {:.2f} $'.format(degrees(om0)), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.70, 0.96, r'$r  = {:.2f} $'.format(r0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.70, 0.92, r'$dr  = {:.2f} $'.format(dr0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.85, 0.96, r'$\theta  = {:.2f} $'.format(degrees(th0)), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.85, 0.92, r'$\omega  = {:.2f} $'.format(degrees(om0)), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
     ax2.plot(th, om, color='C0')
-    ax2.plot(r, dr, color='C1')
+    # ax2.plot(r, dr, color='C1')
 
     #####     ================      Animation      ================      #####
 
@@ -160,7 +168,7 @@ def see_animation(save=False):
         sector.set_theta1(90)
         return line, line2, phase1, phase2, time_text, sector
 
-    def animate(i):
+    def update(i):
         i *= ratio
         start = max(0, i - 250000)
         thisx = [x2[i], 0, x1[i], x1[i]]
@@ -171,19 +179,21 @@ def see_animation(save=False):
         phase1.set_data(th[i], om[i])
         phase2.set_data(r[i], dr[i])
 
-        time_text.set_text(time_template % (t[i+ratio-1]))
+        time_text.set_text(time_template.format(t[i+ratio-1]))
         sector.set_theta1(90-360*t[i+ratio-1]/Tend)
         ax.add_patch(sector)
 
         return line, line2, phase1, phase2, time_text, sector
 
-    anim = FuncAnimation(fig, animate, n // ratio,
-                         interval=5, blit=True,
-                         init_func=init, repeat_delay=5000)
-    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
+    fig.tight_layout()
+    anim = FuncAnimation(fig, update, n // ratio, interval=5, blit=True, init_func=init, repeat_delay=5000)
+    # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
 
-    if save:
+    if save == "save":
         anim.save('Atwood_System_1.html', fps=30)
+    if save == "snapshot":
+        update(int(20. * n / Tend))
+        fig.savefig("./atwood.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -236,4 +246,4 @@ see_path(1, [array([x2, y2]), array([2*x2, 2*y2])],
 
 #see_path_1(1, array([om, dr]), r, 'inferno', name='om - dr', shift=(0., 0.), var_case=4, save='save')
 
-see_animation()
+see_animation(save="")
