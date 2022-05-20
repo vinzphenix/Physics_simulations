@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 ftSz1, ftSz2, ftSz3 = 18, 16, 13
 plt.rcParams["text.usetex"] = True
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def load_file(s, number):

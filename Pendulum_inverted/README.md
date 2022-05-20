@@ -6,7 +6,7 @@
 ![ode](./ode_horizontal.png)
 
 ### Example
-![example](./pendulum_horizontal.svg)
+![example](./pendulum_horizontal.gif)
 
 
 ## Vertical excitation
@@ -15,4 +15,4 @@
 ![ode](./ode_vertical.png)
 
 ### Example
-![example](./pendulum_vertical.svg)
+![example](./pendulum_vertical.gif)

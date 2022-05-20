@@ -10,7 +10,7 @@ from potential_torus_3D import set_axes_equal
 
 ftSz1, ftSz2 = 20, 13
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def check_cross(th_prev, th_next):

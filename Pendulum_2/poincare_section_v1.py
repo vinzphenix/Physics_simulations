@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy import sin, cos, pi, arccos, array, zeros, sqrt, linspace, degrees, radians, remainder
 
-from Pendule_double_adim import db_pendulum_solver, see_animation, draw_image
+from double_pendulum_adim import db_pendulum_solver, see_animation, draw_image
 from scipy.interpolate import interp1d
 
 ftSz1, ftSz2, ftSz3 = 18, 15, 13
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def interpolate(Ua, Ub):

@@ -4,4 +4,4 @@
 ![ode](./ode_simple_pendulum.png)
 
 ## Example
-![example](./simple_pendulum.svg)
+![example](./simple_pendulum.gif)

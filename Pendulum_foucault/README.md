@@ -5,4 +5,4 @@
 ![ode](./ode_foucault.png)
 
 ## Example
-![example](./pendulum_foucault.svg)
+![example](./foucault_pendulum.gif)

@@ -10,13 +10,13 @@ from numpy import sin, cos, pi, arccos, sqrt, degrees, radians
 from time import perf_counter
 from tqdm import tqdm
 
-from Pendule_double_adim import db_pendulum_solver, see_animation, draw_image
+from double_pendulum_adim import db_pendulum_solver, see_animation, draw_image
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 
 ftSz1, ftSz2, ftSz3 = 18, 15, 13
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def dynamics(_, y_):

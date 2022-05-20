@@ -8,7 +8,7 @@ from matplotlib.ticker import FormatStrFormatter
 
 ftSz1, ftSz2, ftSz3 = 18, 17, 14
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def compute_eigenvalues(eq, l, m):

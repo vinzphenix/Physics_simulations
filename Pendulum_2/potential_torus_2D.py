@@ -8,7 +8,7 @@ import matplotlib.animation as animation
 
 ftSz1, ftSz2 = 20, 13
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def compute_level_set(c, mu_l):

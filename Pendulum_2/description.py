@@ -8,7 +8,7 @@ from matplotlib.patches import Arc
 
 ftSz1, ftSz2 = 22, 19
 plt.rcParams["text.usetex"] = False
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 
 
 def draw_one_frame(phi1, phi2, l1, l2):

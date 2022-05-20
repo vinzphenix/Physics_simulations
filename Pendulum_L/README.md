@@ -5,4 +5,4 @@
 Too complicated `-> code`
 
 ## Example
-![example](./pendulum_L.svg)
+![example](./pendulum_L.gif)

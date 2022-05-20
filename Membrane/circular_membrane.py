@@ -6,7 +6,7 @@ from scipy.integrate import quad, dblquad
 from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
 from numpy import sqrt, sin, cos, linspace, pi, outer, exp, ones, zeros, newaxis, repeat, abs
 
-plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.usetex'] = False
 ftSz1, ftSz2, ftSz3 = 20, 15, 13
 

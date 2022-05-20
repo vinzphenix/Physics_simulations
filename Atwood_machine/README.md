@@ -4,4 +4,4 @@
 ![ode](./ode_atwood.png)
 
 ## Example
-![example](./atwood.svg)
+![example](./atwood.gif)

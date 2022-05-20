@@ -4,4 +4,4 @@
 ![ode](./ode_disks.png)
 
 ## Example
-![example](./disks.svg)
+![example](./disks.gif)

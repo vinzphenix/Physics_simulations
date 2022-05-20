@@ -9,4 +9,4 @@
 ![ode](./ode_driven_dimless.png)
 
 ## Example
-![example](./pendulum_driven.svg)
+![example](./driven_pendulum.gif)
