@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -9,8 +8,9 @@ from timeit import default_timer as timer
 from scipy.integrate import odeint
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 14
 
 #########################################################################################################
 
@@ -83,16 +83,20 @@ acc = hypot(ddx, ddy)
 #####     ================      Animation du Système      ================      #####
 
 
-def see_animation(save=False, phaseSpace=0):
+def see_animation(save="", phaseSpace=0):
+    global ratio
+    if save == "snapshot":
+        ratio = 1
+        plt.rcParams['text.usetex'] = True
+
     #####     ================      Création de la figure      ================      #####
 
     max_x = 1.1 * amax(r + l)
 
-    fig = plt.figure(figsize=(11.2, 6.3))
+    fig = plt.figure(figsize=(13., 6.))
 
     ax = fig.add_subplot(121, xlim=(-max_x, max_x), ylim=(-max_x, max_x), aspect='equal')
     ax.grid(ls=':')
-
     ax2 = fig.add_subplot(122)
     ax2.grid(ls=':')
 
@@ -103,23 +107,23 @@ def see_animation(save=False, phaseSpace=0):
     phase1, = ax2.plot([], [], marker='o', ms=8, color='C0')
     phase2, = ax2.plot([], [], marker='o', ms=8, color='C1')
 
-    time_template = r'$t = %.1fs $'
-    time_text = ax.text(0.8, 0.94, '', fontsize=15, transform=ax.transAxes)
-    sector = patches.Wedge((0.85, 0.85), 0.04, theta1=90, theta2=90, color='lightgrey', transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.79, 0.94, '', fontsize=ftSz2, transform=ax.transAxes)
+    sector = patches.Wedge((0.875*l, 0.85*l), 0.04*l, theta1=90, theta2=90, color='lightgrey', transform=ax.transAxes)
 
-    ax.text(0.17, 0.96, r'$l  = {:.2f} \,m$'.format(l), fontsize=10, wrap=True, transform=ax.transAxes)
-    ax.text(0.17, 0.93, r'$m  = {:.2f} \,kg$'.format(m), fontsize=10, wrap=True, transform=ax.transAxes)
-    ax.text(0.17, 0.90, r'$k  = {:.2f} \,N/m$'.format(k), fontsize=10, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.86, r'$k  \,\, = {:.2f} \,N/m$'.format(k), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.82, r'$\ell \:\; = {:.2f} \,m$'.format(l), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.78, r'$m  = {:.2f} \,kg$'.format(m), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.02, 0.96, r'$r         = {:.2f} $'.format(r0), fontsize=10, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.93, r'$v         = {:.2f} $'.format(v0), fontsize=10, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.90, r'$\vartheta = {:.2f} $'.format(th0), fontsize=10, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.87, r'$\omega    = {:.2f} $'.format(om0), fontsize=10, wrap=True, transform=ax.transAxes)
-
+    ax.text(0.02, 0.96, r'$r         = {:.2f} $'.format(r0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.92, r'$v         = {:.2f} $'.format(v0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.17, 0.96, r'$\vartheta = {:.2f} $'.format(th0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.17, 0.92, r'$\omega    = {:.2f} $'.format(om0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    # 87 90 93 96
     if phaseSpace == 0:
-        ax2.plot(th, om, color='C0', label=r'$\vartheta / \omega$')
-        ax2.plot(r - m * g / k, v, color='C1', label=r'$r / v$')
-        ax2.legend()
+        ax2.plot(th, om, color='C0', label=r'$\vartheta \; :\; \omega$')
+        ax2.plot(r - m * g / k, v, color='C1', label=r'$r \;\, : \; v$')
+        ax2.legend(fontsize=ftSz3)
     elif phaseSpace == 1:
         ax2.plot(x, y, color='C0', label='Trajectoire')
         ax2.set_aspect('equal')
@@ -129,7 +133,7 @@ def see_animation(save=False, phaseSpace=0):
         ax2.plot(om, (r - m * g / k), color='C3', label=r'$\omega / r$')
         ax2.plot(om, v, color='C4', label=r'$\omega / v$')
         ax2.plot(r, v, color='C5', label=r'$r / v$')
-        ax2.legend()
+        ax2.legend(fontsize=ftSz3)
 
     #####     ================      Animation      ================      #####
 
@@ -148,7 +152,7 @@ def see_animation(save=False, phaseSpace=0):
 
         return tuple(liste)
 
-    def animate(i):
+    def update(i):
 
         i *= ratio
         start = max(0, i - 10000)
@@ -166,7 +170,7 @@ def see_animation(save=False, phaseSpace=0):
             phase1.set_data(th[i], r[i] - m * g / k)
             phase2.set_data(om[i], v[i])
 
-        time_text.set_text(time_template % (t[i + ratio - 1]))
+        time_text.set_text(time_template.format(t[i + ratio - 1]))
         sector.set_theta1(90 - 360 * t[i + ratio - 1] / Tend)
         ax.add_patch(sector)
 
@@ -174,14 +178,15 @@ def see_animation(save=False, phaseSpace=0):
 
         return tuple(liste)
 
-    anim = FuncAnimation(fig, animate, n // ratio,
-                         interval=10, blit=True,
-                         init_func=init, repeat_delay=3000)
+    anim = FuncAnimation(fig, update, n // ratio, interval=10, blit=True, init_func=init, repeat_delay=3000)
+    fig.tight_layout()
+    # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
 
-    plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
-
-    if save:
+    if save == "save":
         anim.save('Pendule_Elastique_1', fps=30)
+    if save == "snapshot":
+        update(int(8. * n / Tend))
+        fig.savefig("./pendulum_elastic.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -227,4 +232,4 @@ see_path_1(1, array([r, v]), speed, color='viridis', var_case=2, name='6', shift
 #see_path_1(1, array([th, om]), hypot(r, v), 'inferno', var_case=2, save=False)
 # see_path_2(1,array([phi2,sin(om2)]), array([phi1,sin(om1)]), hypot(v2x,v2y), hypot(vx,vy), 'inferno','viridis', var_case=2, save=False)
 
-see_animation(phaseSpace=0)
+see_animation(save="", phaseSpace=0)

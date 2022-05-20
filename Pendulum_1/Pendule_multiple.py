@@ -19,7 +19,7 @@ matplotlib.rcParams['mathtext.rm'] = 'serif'
 g   = 9.81              # [m/s²]  -  accélaration de pesanteur
 l   = 0.50              # [m]     -  longueur petit pendule
 L   = 1.00              # [m]     -  longueur grand pendule
-n_p = 25                # [/]     -  nombre de pendules
+n_p = 30                # [/]     -  nombre de pendules
 D   = 0.1              # [kg/s]  -  coefficient de frottement linéaire
 m   = 1                 # [kg]    -  masse pendule
 
@@ -60,7 +60,7 @@ y_max = amax(y) + 0.1 * amax(abs(y))
 
 #####     ================      Animation du Système      ================      #####
 
-def see_animation(save=False):
+def see_animation(save):
 
     #####     ================      Création de la figure      ================      #####
 
@@ -114,10 +114,10 @@ def see_animation(save=False):
     anim = FuncAnimation(fig, animate, n//ratio, init_func=init, interval=5, blit=True, repeat_delay=3000)
     # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.02, top=0.92, wspace=None, hspace=None)
 
-    if save:
+    if save == "save":
         anim.save('Pendule_multiple_1.html', fps=20)
     else:
         plt.show()
 
 
-see_animation(save=False)
+see_animation(save="")

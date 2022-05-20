@@ -1,12 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from mpl_toolkits.mplot3d import Axes3D
 from scipy.special import jv, jn_zeros
 from scipy.integrate import quad, dblquad
-from matplotlib.animation import FuncAnimation
-from matplotlib import cm
+from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
 from numpy import sqrt, sin, cos, linspace, pi, outer, exp, ones, zeros, newaxis, repeat, abs
+
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 15, 13
 
 
 # initial conditions f
@@ -20,8 +22,8 @@ f5 = lambda r_, t_: 1 / 1 * (cos(pi / b * (2 * 0 + 1) / 2 * r_)) * (1 - r_ * cos
 
 
 def update_plot(idx):
-    ax.view_init(elev=22 - 7 * idx / nt, azim=120 + 60 * idx / nt)
-    time_text.set_text(time_template % (t[idx]))
+    ax.view_init(elev=22 - 6 * idx / nt, azim=120 + 30 * idx / nt)
+    time_text.set_text(time_template.format(t[idx]))
     plot[0].remove()
 
     plot[0] = ax.plot_surface(x, y, U[:, :, idx], linewidth=0, antialiased=False, rstride=1, cstride=1,
@@ -30,18 +32,18 @@ def update_plot(idx):
 
 if __name__ == "__main__":
 
-    f = f5  # initial condition
+    f = f2  # initial condition
 
     c = 1  # speed of the wave
-    h = 0.1  # damping coefficient
+    h = 0.02  # damping coefficient
     b = 2  # radius of the membrane
     #Tend = 10 * 2 * pi / (sqrt((jn_zeros(2, 2)[-1]) ** 2 + h ** 2))  # duration of the simulation
-    Tend = 3
+    Tend = 8.
     fps = 20  # frames per second
 
     nr = 50  # 100  # number of steps in the r direction
     nth = 50  # 100  # number of steps in the theta direction
-    nt =  int(fps * Tend)  # number of time steps
+    nt =  int(fps * Tend) + 1  # number of time steps
 
     n = 8  # number of terms in the summation
     m = 5
@@ -118,8 +120,9 @@ if __name__ == "__main__":
     # print("U : {} \n E : {} \n T : {} \n R : {}".format(U.shape, E.shape, T.shape, R.shape))
 
     fig = plt.figure(figsize=(8, 8))
-    ax = Axes3D(fig, proj_type='persp')
-    cmap = cm.get_cmap('jet')
+    ax = fig.add_subplot(projection='3d')
+    # ax = Axes3D(fig, proj_type='persp')
+    cmap = plt.get_cmap('jet')
 
     ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))  # delete grey background and the numbers on the axis
     ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -130,13 +133,21 @@ if __name__ == "__main__":
 
     plot = [ax.plot_surface(x, y, U[:, :, 0], cmap=cmap, rstride=1, cstride=1)]
 
-    time_template = r'$t = %.1fs$'
-    time_text = ax.text2D(0.8, 0.9, '', fontsize=12, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$'
+    time_text = ax.text2D(0.8, 0.9, '', fontsize=ftSz2, transform=ax.transAxes)
 
     ax.set_xlim(-b * 1.05, b * 1.05)
     ax.set_ylim(-b * 1.05, b * 1.05)
     ax.set_zlim(-b * 1.05, b * 1.05)
 
-    animate = FuncAnimation(fig, update_plot, nt)
-    # animate.save('circular_membrane_II_B.html', fps=fps)
-    plt.show()
+    anim = FuncAnimation(fig, update_plot, nt)
+    save = ""
+
+    if save == "gif":
+        writerGIF = PillowWriter(fps=fps)
+        anim.save(f"./anim_circular.gif", writer=writerGIF, dpi=100)
+    elif save == "html":
+        anim.save('circular_membrane_II_B.html', fps=fps)
+    else:
+        plt.show()
+

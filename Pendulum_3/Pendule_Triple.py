@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -9,8 +8,9 @@ from scipy.integrate import odeint
 from timeit import default_timer as timer
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 12
 
 ########################################################################################################
 
@@ -34,7 +34,7 @@ om3_0  = 8.3046730               # [rad/s] -  v angulaire 2em pendule
 
 Tend = 7.  # [s]    -  fin de la simulation
 n = int(1050 * Tend)
-fps = 30
+fps = 100
 ratio = n // (int(Tend * fps))
 
 # phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.06113, 0.42713, 2.01926, 0, 0, 0
@@ -74,7 +74,7 @@ def f(u, _):
         th2) + m3 * g * sin(th3) * C32)
     Num2 = m * l2 * w2 * w2 * S21 + m3 * C31 * (
         g * sin(th3) + l2 * w2 * w2 * S32 + l1 * w1 * w1 * S31) + m3 * l3 * w3 * w3 * S31 - M * g * sin(th1)
-    Den = l1 * (M + (m * C21 - m3 * C31 * C32) * (-m * C21 + m3 * C31 * C32) / (m - m3 * C32 * C32) - m3 * C31 * C31)
+    Den = l1 * (M - (m * C21 - m3 * C31 * C32) * (m * C21 - m3 * C31 * C32) / (m - m3 * C32 * C32) - m3 * C31 * C31)
 
     f1 = (Num1 + Num2) / Den
     f2 = (f1 * (-l1 * m * C21 + m3 * l1 * C31 * C32) + l1 * w1 * w1 * (
@@ -114,20 +114,26 @@ v3 = sqrt(vx3 * vx3 + vy3 * vy3)
 
 #####     ================      Animation du Système      ================      #####
 
-def see_animation(save=False):
+def see_animation(save=""):
+    global ratio
+    ratio = 1 if save == "snapshot" else ratio
+    plt.rcParams['text.usetex'] = (save == "snapshot")
 
     #####     ================      Création de la figure      ================      #####
 
-    fig, axs = plt.subplots(1, 2, figsize=(12, 5.8), constrained_layout=True)
+    fig, axs = plt.subplots(1, 2, figsize=(14, 7.))
 
-    ax = axs[0]
-    ax.axis([-1.1 * L, 1.1 * L, -1.1 * L, 1.1 * L])
+    ax, ax2 = axs[0], axs[1]
+
+    xmin, xmax = min(np.amin(x1), np.amin(x2), np.amin(x3)), max(np.amax(x1), np.amax(x2), np.amax(x3))
+    ymin, ymax = -L, max(np.amax(y1), np.amax(y2), np.amax(y3), 0.)
+    xmax = max(-xmin, xmax)
+    xmax = max(xmax, 0.5 * (ymax-ymin))
+    ax.axis([-1.15 * xmax, 1.15 * xmax, ymin - 0.1 * xmax, ymin + 2.2 * xmax])
+    # ax.axis([-1.1*L, 1.1*L, -1.1*L, 1.1*L])
     ax.set_aspect("equal")
-
-    ax2 = axs[1]
-    ax2.set_xlabel('phi [rad]')
-    ax2.set_ylabel('omega [rad/s]')
-
+    ax2.set_xlabel(r'$\varphi \rm [rad]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$\omega \rm [rad/s]$', fontsize=ftSz2)
     ax.grid(ls=':')
     ax2.grid(ls=':')
 
@@ -137,28 +143,28 @@ def see_animation(save=False):
     line4, = ax.plot([], [], '-', lw=1, color='grey')
     line5, = ax.plot([], [], '-', lw=1, color='lightgrey')
 
-    sector = patches.Wedge((L, -L), L / 15, theta1=90, theta2=90, color='lightgrey')
+    sector = patches.Wedge((xmax, ymin + 0.1 / 2. * xmax), xmax / 10., theta1=90, theta2=90, color='lightgrey')
 
     phase1, = ax2.plot([], [], marker='o', ms=8, color='C0')
     phase2, = ax2.plot([], [], marker='o', ms=8, color='C0')
     phase3, = ax2.plot([], [], marker='o', ms=8, color='C0')
 
-    time_template = r'$t = %.1f s$'
-    time_text = ax.text(0.42, 0.94, '', fontsize=15, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.50, 0.95, '', fontsize=ftSz2, transform=ax.transAxes, ha="center")
 
-    ax.text(0.02, 0.96, r'$l_1  = {:.2f} \: \rm m$'.format(l1), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.92, r'$l_2  = {:.2f} \: \rm m$'.format(l2), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.88, r'$l_3  = {:.2f} \: \rm m$'.format(l3), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.18, 0.96, r'$m_1  = {:.2f} \: \rm kg$'.format(m1), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.18, 0.92, r'$m_2  = {:.2f} \: \rm kg$'.format(m2), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.18, 0.88, r'$m_3  = {:.2f} \: \rm kg$'.format(m3), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.96, r'$l_1  = {:.2f} \: \rm m$'.format(l1), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.92, r'$l_2  = {:.2f} \: \rm m$'.format(l2), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.88, r'$l_3  = {:.2f} \: \rm m$'.format(l3), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.18, 0.96, r'$m_1  = {:.2f} \: \rm kg$'.format(m1), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.18, 0.92, r'$m_2  = {:.2f} \: \rm kg$'.format(m2), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.18, 0.88, r'$m_3  = {:.2f} \: \rm kg$'.format(m3), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.62, 0.96, r'$\varphi_1  = {:.2f}$'.format(phi1_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.62, 0.92, r'$\varphi_2  = {:.2f}$'.format(phi2_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.62, 0.88, r'$\varphi_3  = {:.2f}$'.format(phi3_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.82, 0.96, r'$\omega_1  = {:.2f}$'.format(om1_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.82, 0.92, r'$\omega_2  = {:.2f}$'.format(om2_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.82, 0.88, r'$\omega_3  = {:.2f}$'.format(om3_0), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.64, 0.96, r'$\varphi_1  = {:.2f}$'.format(phi1_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.64, 0.92, r'$\varphi_2  = {:.2f}$'.format(phi2_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.64, 0.88, r'$\varphi_3  = {:.2f}$'.format(phi3_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.84, 0.96, r'$\omega_1  = {:.2f}$'.format(om1_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.84, 0.92, r'$\omega_2  = {:.2f}$'.format(om2_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.84, 0.88, r'$\omega_3  = {:.2f}$'.format(om3_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
     ax2.plot(phi1, om1, color='C1')
     ax2.plot(phi2, om2, color='C2')
@@ -179,7 +185,7 @@ def see_animation(save=False):
         time_text.set_text('')
         return line1, line2, line3, line4, line5, phase1, time_text, phase2, phase3, sector
 
-    def animate(i):
+    def update(i):
         i *= ratio
         start = max(0, i - 10000)
         thisx, thisx2, thisx3 = [0, x1[i]], [x1[i], x2[i]], [x2[i], x3[i]]
@@ -193,7 +199,7 @@ def see_animation(save=False):
 
         sector.set_theta1(90 - 360 * t[i + ratio - 1] / Tend)
         ax.add_patch(sector)
-        time_text.set_text(time_template % (t[i + ratio - 1]))
+        time_text.set_text(time_template.format(t[i + ratio - 1]))
 
         phase1.set_data(phi1[i], om1[i])
         phase2.set_data(phi2[i], om2[i])
@@ -201,13 +207,15 @@ def see_animation(save=False):
 
         return line1, line2, line3, line4, line5, phase1, time_text, phase2, phase3, sector
 
-    anim = FuncAnimation(fig, animate, n // ratio,
-                         interval=5, blit=True, init_func=init, repeat_delay=3000)
-
+    anim = FuncAnimation(fig, update, n // ratio, interval=5, blit=True, init_func=init, repeat_delay=3000)
     # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
+    fig.tight_layout()
 
-    if save:
+    if save == "save":
         anim.save('triple_pendulum_2.html', fps=30)
+    if save == "snapshot":
+        update(int(5. * n / Tend))
+        fig.savefig("./triple_pendulum.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -242,4 +250,4 @@ parameters = [
 # see_path_1(1, array([x2, y2]), v2, color='jet', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
 # see_path_1(1, array([x3, y3]), v3, color='viridis', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
 
-see_animation()
+see_animation(save="")

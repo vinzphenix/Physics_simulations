@@ -90,7 +90,6 @@ def animated(i):
     return line1, line2a, line2b, line3, line4, mark_ph, mark_gr, mark_ph1, mark_ph2, time_text
 
 
-anim = FuncAnimation(fig, animated, nt, interval=1,
-                    blit=True, init_func=init, repeat_delay=1000)
+anim = FuncAnimation(fig, animated, nt, interval=1, blit=True, init_func=init, repeat_delay=1000)
 # anim.save('Group_Velocity_2.html', fps=30)
 plt.show()

@@ -9,8 +9,9 @@ from scipy.integrate import odeint
 from timeit import default_timer as timer
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 14
 #inferno, viridis, jet, magma
 
 ########################################################################################################
@@ -29,7 +30,7 @@ dx_0 = 0  # [m/s]   -  vitesse du bloc
 phi_0 = 0.6 * pi  # [rad]   -  angle pendule
 om_0 = 0  # [rad/s] -  v angulaire pendule
 
-Tend = 60  # [s]    -  fin de la simulation
+Tend = 30.  # [s]    -  fin de la simulation
 n = int(500 * Tend)
 fps = 30
 ratio = n // (int(Tend * fps))
@@ -48,13 +49,13 @@ ratio = n // (int(Tend * fps))
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.4, 2.5, 10, 50, 2.5*sqrt(g), 0, 0, 3*pi/4, 0
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.5, 1e-3, 10, 1000, 20*g, 0, 0, pi/3, 0
 
-#l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.3, 10.0, sqrt(g / 0.3), 80, 4 * sqrt(g / 0.3 ** 2), 0, 0, 0.39 * pi, 0)
-#l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (4., 10.0, sqrt(g / 4.), 80, 4 * sqrt(g / 4. ** 2), 0, 0, 0.39 * pi, 0)
-#l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.4, 10.0, 10.0/4, 50, sqrt(g / l ** 2), 0, 0, 3 * pi / 4, 0)
+# l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.3, 10.0, sqrt(g / 0.3), 80, 4 * sqrt(g / 0.3 ** 2), 0, 0, 0.39 * pi, 0)
+# l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (4., 10.0, sqrt(g / 4.), 80, 4 * sqrt(g / 4. ** 2), 0, 0, 0.39 * pi, 0)
+# l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.4, 10.0, 10.0/4, 50, sqrt(g / l ** 2), 0, 0, 3 * pi / 4, 0)
 
 
 # THESE LOOK THE SAME
-#l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.5, 0.001, 2, 250, 2 * pi * 6.52, 0, 0, pi / 4, 0)
+# l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.5, 0.001, 2, 250, 2 * pi * 6.52, 0, 0, pi / 4, 0)
 #l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.5, 0.001, 2, 500, 2 * pi * 8.51, 0, 0, pi / 4, 0)
 #l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.5, 0.001, 2, 599, 2*pi*10, 0, 0, pi / 4, 0)
 #l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = (0.5, 0.001, 2, 802.95, 2*pi*10, 0, 0, pi / 4, 0)
@@ -110,38 +111,44 @@ vp  = sqrt(vxp*vxp+vyp*vyp)
 #####     ================      Animation du Système      ================      #####
 
 
-def see_animation(variables=(phi, om), save=False):
+def see_animation(variables=(phi, om), save=""):
+    global ratio
+    if save == "snapshot":
+        ratio = 1
+        plt.rcParams['text.usetex'] = True
 
     #####     ================      Création de la figure      ================      #####
 
-    fig = plt.figure(figsize=(14, 8))
+    fig = plt.figure(figsize=(15., 6.5))
     ax = fig.add_subplot(121, xlim=(x_min - 1.2 * l, x_max + 1.2 * l), ylim=(-d / 2, d / 2), aspect='equal')
-    ax2 = fig.add_subplot(122, xlabel=r'$\varphi \rm [rad]$', ylabel=r'$\omega \rm [rad/s]$')
+    ax2 = fig.add_subplot(122)
+    ax2.set_xlabel(r'$\varphi \rm [rad]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$\omega \rm [rad/s]$', fontsize=ftSz2)
     ax.grid(ls=':')
     ax2.grid(ls=':')
 
     line1, = ax.plot([], [], 'o-', lw=2, color='C2')
     line2, = ax.plot([], [], '-', lw=1, color='grey')
-    rect = plt.Rectangle((xb[0] - l, -0.2 * l), 2 * l, 0.2 * l, color='C1')
+    rect = plt.Rectangle((xb[0] - l, -0.1 * l), 2 * l, 0.2 * l, color='C1')
     ax.add_patch(rect)
 
     phase1, = ax2.plot([], [], marker='o', ms=8, color='C0')
 
-    time_template = r'$t = %.1f s$'
-    time_text = ax.text(0.48, 0.94, '', fontsize=15, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.48, 0.94, '', fontsize=ftSz2, transform=ax.transAxes)
     sector = patches.Wedge(((x_max + 1.2 * l) * 0.9, -d / 2 * 0.87), d / 20, theta1=90, theta2=90, color='lightgrey')
 
-    ax.text(0.02, 0.96, r'$l  \: \: \: = {:.2f} \: kg$'.format(l), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.92, r'$m  = {:.2f} \: kg$'.format(mp), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.88, r'$M  = {:.2f} \: kg$'.format(mb), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.19, 0.96, r'$F   = {:.2f} \: N$'.format(F), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.19, 0.92, r'$\omega  = {:.2f} \: rad/s$'.format(w), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.96, r'$l  \: \: \: = {:.2f} \: kg$'.format(l), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.92, r'$m  = {:.2f} \: kg$'.format(mp), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.88, r'$M  = {:.2f} \: kg$'.format(mb), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.21, 0.96, r'$F   = {:.2f} \: N$'.format(F), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.21, 0.92, r'$\omega  = {:.2f} \: rad/s$'.format(w), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.70, 0.96, r'$x = {:.2f} $'.format(x_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.70, 0.92, r'$v = {:.2f} $'.format(dx_0), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.82, 0.96, r'$\varphi  = {:.2f} $'.format(180 / pi * phi_0), fontsize=12, wrap=True,
+    ax.text(0.70, 0.96, r'$x_0 = {:.2f} $'.format(x_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.70, 0.92, r'$v_0 = {:.2f} $'.format(dx_0), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.84, 0.96, r'$\varphi_0  = {:.2f} $'.format(180 / pi * phi_0), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.82, 0.92, r'$\.\varphi  = {:.2f} $'.format(180 / pi * om_0), fontsize=12, wrap=True,
+    ax.text(0.84, 0.92, r'$\dot{{\varphi}}_0  = {:.2f} $'.format(180 / pi * om_0), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
 
     ax2.plot(variables[0], variables[1], color='C2')
@@ -153,22 +160,22 @@ def see_animation(variables=(phi, om), save=False):
     def init():
         line1.set_data([], [])
         line2.set_data([], [])
-        rect.set_bounds(xb[0] - l, -0.2 * l, 2 * l, 0.2 * l)
+        rect.set_bounds(xb[0] - l, -0.1 * l, 2 * l, 0.2 * l)
         phase1.set_data([], [])
         time_text.set_text('')
         sector.set_theta1(90)
         return line1, line2, rect, phase1, time_text, sector
 
-    def animate(i):
+    def update(i):
         i *= ratio
-        start = max(0, i - 2000)
+        start = max(0, i - 20000)
         thisx, thisy = [xb[i], xp[i]], [yb[i], yp[i]]
 
         line1.set_data(thisx, thisy)
         line2.set_data([xp[start:i + 1]], [yp[start:i + 1]])
         rect.set_x(xb[i] - l)
 
-        time_text.set_text(time_template % (t[i]))
+        time_text.set_text(time_template.format(t[i]))
         sector.set_theta1(90 - 360 * t[i + ratio - 1] / Tend)
         ax.add_patch(sector)
 
@@ -176,14 +183,15 @@ def see_animation(variables=(phi, om), save=False):
 
         return line1, line2, rect, phase1, time_text, sector
 
-    anim = FuncAnimation(fig, animate, n//ratio,
-                         interval=5, repeat_delay=3000,
-                         blit=True, init_func=init)
+    anim = FuncAnimation(fig, update, n//ratio, interval=20, repeat_delay=3000, blit=True, init_func=init)
+    # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
+    fig.tight_layout()
 
-    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
-
-    if save:
+    if save == "save":
         anim.save('Horizontal_Inverted_Pendulum_2.html', fps=30)
+    if save == "snapshot":
+        update(int(12. * n / Tend))
+        fig.savefig("./pendulum_horizontal.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -233,4 +241,4 @@ see_path_1(1, np.array([om, dx]), vp, color='viridis', var_case=2, name='5', shi
 see_path_1(1, np.array([x, dx]), vp, color='viridis', var_case=2, name='6', shift=(0., 0.), save="no", displayedInfo=parameters)
 """
 
-see_animation()
+see_animation(save="")

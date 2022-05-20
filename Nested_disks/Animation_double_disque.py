@@ -200,7 +200,7 @@ def see_animation(save=""):
         anim.save('double_disk_3.html', fps=30)
     if save == "snapshot":
         update(int(6.6 * n / Tend))
-        fig.savefig("./disks.svg", format="svg", bbox_inches="tight")
+        fig.savefig("./pendulum_elastic.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 

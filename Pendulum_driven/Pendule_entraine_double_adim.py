@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
@@ -7,8 +6,9 @@ from numpy import sin, cos, linspace, array, sqrt, degrees, amax, amin, radians
 from scipy.integrate import odeint
 from timeit import default_timer as timer
 
-matplotlib.rcParams['mathtext.fontset'] = 'cm'
-matplotlib.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'monospace'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 14
 
 # ATTENTION : convention angles ABSOLUS
 
@@ -17,22 +17,23 @@ matplotlib.rcParams['mathtext.rm'] = 'serif'
 #####     ================      Paramètres  de la simulation      ================      ####
 
 g = 9.81              # [m/s²]  -  accélaration de pesanteur
-l1, l2 = 0.1, 2.0    # [m]     -  longueur des pendules
+l1, l2 = 0.4, 1.0    # [m]     -  longueur des pendules
 
-Tend, fps = 20, 30              # [s]    -  fin de la simulation
+Tend, fps = 25., 30              # [s]    -  fin de la simulation
 n = int(750 * Tend)
 ratio = n//(int(Tend*fps))
 
 liste = [1/2, 2/3, 3/5, 9/17, 17/37]
 
 phi2_0, om2_0 = 0.0, -1.0
-phi1_0, om1 = 0.0, 5.0 * sqrt(g/l2)
+phi1_0, om1 = 0.0, 0.8 * sqrt(g/l2)
 
-#om1 = 5.0 * sqrt(g/l2)
-
-#phi1_0, phi2_0, om1, om2_0, l1, l2, m, D = (0   , 0    , sqrt(g/0.4) , 0      , 0.1     , 0.4    , 1   ,0)
-#phi1_0, phi2_0, om1, om2_0, l1, l2, m, D = (0   , 0    , sqrt(g/0.1) , 0      , 0.1     , 0.1    , 1   , 0)
-#om1 *= liste[1]
+# phi1_0, phi2_0, om1, om2_0, l1, l2 = 0, 0, sqrt(g / 0.4), 0, 0.1, 0.4
+# phi1_0, phi2_0, om1, om2_0, l1, l2 = 0, 0, sqrt(g / 0.1), 0, 0.1, 0.1
+# phi1_0, phi2_0, om1, om2_0, l1, l2 = 0, 0, 0.4 * sqrt(g / (0.2 / sqrt(2))), 0., 0.2, 0.2 / sqrt(2)
+# phi1_0, phi2_0, om1, om2_0, l1, l2 = 0, 0, 0.4 * sqrt(g / 0.1), 0., 0.1, 0.1
+# phi1_0, phi2_0, om1, om2_0, l1, l2 = 0, 0, 0.5 * sqrt(g / 0.1), 0., 0.1, 0.1
+# om1 *= liste[0]
 
 w = sqrt(g / l1)
 l = l2 / l1
@@ -93,31 +94,36 @@ phim, dphim = amax(abs(phi2)), amax(om2)
 #####     ================      Animation du Système      ================      #####
 
 
-def see_animation(save=False):
+def see_animation(save=""):
+    global ratio
+    if save == "snapshot":
+        ratio = 1
+        plt.rcParams['text.usetex'] = True
 
     #####     ================      Création de la figure      ================      #####
 
-    fig = plt.figure(figsize=(14, 8))
+    fig = plt.figure(figsize=(14, 7))
 
-    ax = fig.add_subplot(121, xlim=(-L * 1.1, L * 1.1), ylim=(-1.1 * L, L * 1.1), aspect='equal')
+    ax = fig.add_subplot(121, xlim=(-L * 1.1, L * 1.15), ylim=(-1.1 * L, L * 1.1))
+    ax.set_aspect("equal")
     ax.grid(ls=':')
 
     ax2 = fig.add_subplot(122)
     ax2.grid(ls=':')
-    ax2.set_xlabel(r'$\varphi \; \rm [rad]$', fontsize=12)
-    ax2.set_ylabel(r'$\omega \; \rm [rad/s]$', fontsize=12)
+    ax2.set_xlabel(r'$\varphi \; \rm [rad]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$\omega \; \rm [rad/s]$', fontsize=ftSz2)
 
-    time_template = r'$t = %.2f \rm s$'
-    time_text = ax.text(0.42, 0.94, '1', fontsize=15, wrap=True, transform=ax.transAxes)
+    time_template = r'$t = {:.2f} \; s$' if save == "snapshot" else r'$t = \mathtt{{{:.2f}}} \; s$'
+    time_text = ax.text(0.35, 0.94, '1', fontsize=ftSz2, wrap=True, transform=ax.transAxes)
     sector = patches.Wedge((L, -L), L / 15, theta1=90, theta2=90, color='lightgrey')
 
-    ax.text(0.02, 0.96, r'$l_1 = {:.2f} \: \rm m$'.format(l1), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.92, r'$l_2 = {:.2f} \: \rm m$'.format(l2), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.96, r'$\ell_1 = {:.2f} \: \rm m$'.format(l1), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.92, r'$\ell_2 = {:.2f} \: \rm m$'.format(l2), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.64, 0.96, r'$\varphi_1  = {:.2f}$'.format(degrees(phi1_0)), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.64, 0.92, r'$\varphi_2  = {:.2f}$'.format(degrees(phi2_0)), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.80, 0.96, r'$\omega_1  = {:.2f}$'.format(degrees(om1[0])), fontsize=12, wrap=True, transform=ax.transAxes)
-    ax.text(0.80, 0.92, r'$\omega_2  = {:.2f}$'.format(degrees(om2_0)), fontsize=12, wrap=True, transform=ax.transAxes)
+    ax.text(0.64, 0.96, r'$\varphi_1  = {:.2f}$'.format(degrees(phi1_0)), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.64, 0.92, r'$\varphi_2  = {:.2f}$'.format(degrees(phi2_0)), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.80, 0.96, r'$\omega_1  = {:.2f}$'.format(degrees(om1[0])), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.80, 0.92, r'$\omega_2  = {:.2f}$'.format(degrees(om2_0)), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
 
     ax2.plot(phi2, om2, color='C2')
 
@@ -125,7 +131,8 @@ def see_animation(save=False):
     line2, = ax.plot([], [], 'o-', lw=2, color='C2')
     line3, = ax.plot([], [], '-', lw=1, color='grey')
     phase2, = ax2.plot([], [], marker='o', ms=8, color='C0')
-    rect = plt.Rectangle((L * 1.0, 0), L * 0.05, T[0] / T_max * L)
+    x_pos = 1.075
+    rect = plt.Rectangle((L * x_pos, 0), L * 0.05, T[0] / T_max * L)
 
     #####     ================      Animation      ================      #####
 
@@ -134,12 +141,12 @@ def see_animation(save=False):
         line2.set_data([], [])
         line3.set_data([], [])
         time_text.set_text('')
-        rect.set_bounds(L*1.05, 0, L*0.05, T[0]/T_max*L)
+        rect.set_bounds(L * x_pos, 0, L * 0.05, T[0]/T_max*L)
         phase2.set_data([], [])
         sector.set_theta1(90)
         return line1, line2, line3, time_text, rect, phase2, sector
 
-    def animate(i):
+    def update(i):
         i *= ratio
         start = max((i-50000, 0))
 
@@ -150,9 +157,9 @@ def see_animation(save=False):
         line2.set_data(thisx2, thisy2)
         line3.set_data(x2[start:i + 1], y2[start:i + 1])
 
-        time_text.set_text(time_template % (t[i + ratio - 1]))
+        time_text.set_text(time_template.format(t[i + ratio - 1]))
 
-        rect.set_bounds(L * 1.0, 0, L * 0.05, T[i] / T_max * L)
+        rect.set_bounds(L * x_pos, 0, L * 0.05, T[i] / T_max * L)
         sector.set_theta1(90 - 360 * t[i + ratio - 1] / Tend)
         ax.add_patch(rect)
         ax.add_patch(sector)
@@ -161,14 +168,16 @@ def see_animation(save=False):
 
         return line1, line2, line3, time_text, rect, phase2, sector
 
-    ani = FuncAnimation(fig, animate, n // ratio,
-                        interval=5, blit=True,
-                        init_func=init, repeat_delay=5000)
+    ani = FuncAnimation(fig, update, n // ratio, interval=5, blit=True, init_func=init, repeat_delay=5000)
 
-    plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
+    # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
+    fig.tight_layout()
 
-    if save:
+    if save == "save":
         ani.save('Pendule_entraine_4.html', fps=30)
+    if save == "snapshot":
+        update(int(8. * n / Tend))
+        fig.savefig("./pendulum_elastic.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -178,7 +187,7 @@ def __main__():
 
 
 if __name__ == "__main__":
-    see_animation()
+    see_animation(save="")
 
     #from Utils.Fixed_Path import see_path_1
     #see_path_1(1, array([x2, y2]), v2)
