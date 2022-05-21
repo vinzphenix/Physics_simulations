@@ -1,9 +1,8 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 from numpy import sin, cos, sqrt, pi, hypot
 from scipy.integrate import odeint
 from Utils.Fixed_Path import countDigits, see_path_1, see_path
@@ -28,7 +27,7 @@ def db_pendulum_solver(u_zero, l=1., mu=0.5, mode='auto', Tend=20, sps=720, l1=1
         Tend, l1, m1, lw, cmap = ask('draw', [])
     Tend, l1, m1, lw = float(Tend), float(l1), float(m1), float(lw)
 
-    n, fps = int(sps * Tend), 30
+    n, fps = int(sps * Tend), 20
     ratio = n // (int(Tend * fps))
 
     g = 9.81
@@ -61,7 +60,7 @@ def draw_image(_, phi1, phi2, om1, om2, params, v_params):
     see_path_1(lw, np.array([x2, y2]), v2, cmap)
 
 
-def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), save=False, inside=False):
+def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), save="", inside=False):
     l1, l2, m1, m2, phi1_0, om1_0, phi2_0, om2_0 = params
     n, fps, ratio, lw, cmap = v_params
     L, Tend = l1 + l2, t[-1]
@@ -71,18 +70,20 @@ def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), sa
     x2, y2 = x1 + l2 * sin(phi2), y1 - l2 * cos(phi2)
 
     #####     ================      Création de la figure      ================      #####
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['text.usetex'] = False
+    ftSz1, ftSz2, ftSz3 = 20, 17, 12
 
-    plt.style.use('default')
-    matplotlib.rcParams['mathtext.fontset'] = 'cm'
-    matplotlib.rcParams['mathtext.rm'] = 'serif'
+    ratio = 1 if save == "snapshot" else ratio
+    # plt.rcParams['text.usetex'] = (save == "snapshot") or (save == "gif")
 
     fig = plt.figure(figsize=size)
     ax = fig.add_subplot(121, autoscale_on=False, xlim=(-L * 1.1, L * 1.1), ylim=(-1.1 * L, 1.1 * L), aspect='equal')
     ax.grid(ls=':')
     ax2 = fig.add_subplot(122)
     ax2.grid(ls=':')
-    ax2.set_xlabel(r'$\varphi \; \rm [\:rad\:]$')
-    ax2.set_ylabel(r'$\omega \;\rm [\:rad/s\:]$')
+    ax2.set_xlabel(r'$\varphi \; \rm [\:rad\:]$', fontsize=ftSz2)
+    ax2.set_ylabel(r'$\omega \;\rm [\:rad/s\:]$', fontsize=ftSz2)
 
     line1, = ax.plot([], [], 'o-', lw=2, color='C1')
     line2, = ax.plot([], [], 'o-', lw=2, color='C2')
@@ -92,27 +93,27 @@ def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), sa
     phase2, = ax2.plot([], [], marker='o', ms=8 * scale, color='C0')
 
     time_template = r'$t = %.1fs$'
-    time_text = ax.text(0.42, 0.94, '', fontsize=15 * scale, transform=ax.transAxes)
+    time_text = ax.text(0.42, 0.94, '', fontsize=ftSz2 * scale, transform=ax.transAxes)
     sector = patches.Wedge((L, -L), L / 15, theta1=90, theta2=90, color='lightgrey')
 
-    ax.text(0.02, 0.96, r'$l_1  = {:.2f} \: \rm m$'.format(l1), fontsize=12 * scale, wrap=True, transform=ax.transAxes)
-    ax.text(0.02, 0.92, r'$l_2  = {:.2f} \: \rm m$'.format(l2), fontsize=12 * scale, wrap=True, transform=ax.transAxes)
-    ax.text(0.18, 0.96, r'$m_1  = {:.2f} \: \rm kg$'.format(m1), fontsize=12 * scale, wrap=True, transform=ax.transAxes)
-    ax.text(0.18, 0.92, r'$m_2  = {:.2f} \: \rm kg$'.format(m2), fontsize=12 * scale, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.96, r'$l_1  = {:.2f} \: \rm m$'.format(l1), fontsize=ftSz3 * scale, wrap=True, transform=ax.transAxes)
+    ax.text(0.02, 0.92, r'$l_2  = {:.2f} \: \rm m$'.format(l2), fontsize=ftSz3 * scale, wrap=True, transform=ax.transAxes)
+    ax.text(0.18, 0.96, r'$m_1  = {:.2f} \: \rm kg$'.format(m1), fontsize=ftSz3 * scale, wrap=True, transform=ax.transAxes)
+    ax.text(0.18, 0.92, r'$m_2  = {:.2f} \: \rm kg$'.format(m2), fontsize=ftSz3 * scale, wrap=True, transform=ax.transAxes)
 
-    ax.text(0.61, 0.96, r'$\varphi_1  = {:.2f} $'.format(np.degrees(phi1_0)), fontsize=12 * scale, wrap=True,
+    ax.text(0.61, 0.96, r'$\varphi_1  = {:.2f} $'.format(np.degrees(phi1_0)), fontsize=ftSz3 * scale, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.61, 0.92, r'$\varphi_2  = {:.2f} $'.format(np.degrees(phi2_0)), fontsize=12 * scale, wrap=True,
+    ax.text(0.61, 0.92, r'$\varphi_2  = {:.2f} $'.format(np.degrees(phi2_0)), fontsize=ftSz3 * scale, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.81, 0.96, r'$\omega_1  = {:.2f} $'.format(np.degrees(om1_0)), fontsize=12 * scale, wrap=True,
+    ax.text(0.81, 0.96, r'$\omega_1  = {:.2f} $'.format(np.degrees(om1_0)), fontsize=ftSz3 * scale, wrap=True,
             transform=ax.transAxes)
-    ax.text(0.81, 0.92, r'$\omega_2  = {:.2f} $'.format(np.degrees(om2_0)), fontsize=12 * scale, wrap=True,
+    ax.text(0.81, 0.92, r'$\omega_2  = {:.2f} $'.format(np.degrees(om2_0)), fontsize=ftSz3 * scale, wrap=True,
             transform=ax.transAxes)
 
-    phi1 = np.fmod(np.fmod(phi1, 2 * pi) + 2 * pi + pi, 2 * pi) - pi
-    phi2 = np.fmod(np.fmod(phi2, 2 * pi) + 2 * pi + pi, 2 * pi) - pi
-    ax2.plot(phi1, om1, color='C1', ls='', marker='.', markersize=0.1)
-    ax2.plot(phi2, om2, color='C2', ls='', marker='.', markersize=0.1)
+    # phi1 = np.fmod(np.fmod(phi1, 2 * pi) + 2 * pi + pi, 2 * pi) - pi
+    # phi2 = np.fmod(np.fmod(phi2, 2 * pi) + 2 * pi + pi, 2 * pi) - pi
+    ax2.plot(phi1, om1, color='C1', ls='-', marker='', markersize=0.1)
+    ax2.plot(phi2, om2, color='C2', ls='-', marker='', markersize=0.1)
 
     #####     ================      Animation      ================      #####
 
@@ -128,7 +129,7 @@ def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), sa
 
         return tuple(liste)
 
-    def animate(i):
+    def update(i):
         i *= ratio
         start = max(0, i - 250000)
         thisx, thisy = [0, x1[i]], [0, y1[i]]
@@ -155,16 +156,19 @@ def see_animation(t, phi1, phi2, om1, om2, params, v_params, size=(8.4, 4.8), sa
         return
 
     fig.canvas.mpl_connect('button_press_event', onThisClick)
-    anim = FuncAnimation(fig, animate, n // ratio,
+    anim = FuncAnimation(fig, update, n // ratio,
                          interval=5 * (14 / size[0]) ** 1.75, blit=True, init_func=init, repeat_delay=3000)
 
-    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
+    # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.92, wspace=None, hspace=None)
     plt.tight_layout()
 
-    if save:
+    if save == "save":
         anim.save('double_pendulum_1.html', fps=30)
-    elif inside:
-        plt.show()
+    elif save == "gif":
+        anim.save('./animations/trajectory.gif', writer=PillowWriter(fps=20))
+    elif save == "snapshot":
+        update(int(5. * n / Tend))
+        fig.savefig("./figures/trajectory.svg", format="svg", bbox_inches="tight")
     else:
         plt.show()
 
@@ -173,7 +177,7 @@ def __main__(what_to_do=0):
     ########################################################################################################
     #####     ================      Paramètres  de la simulation      ================      ####
 
-    g, l1, m1, Tend = 9.81, 1.00, 1.00, 60
+    g, l1, m1, Tend = 9.81, 1.00, 1.00, 10.41
 
     # l, mu = 0.25, 0.75
     # phi1_0, om1_0, phi2_0, om2_0 = 0.000, 0.732, -0.017, -0.136
@@ -191,9 +195,9 @@ def __main__(what_to_do=0):
     # l, mu = 0.8, 0.1
     # phi1_0, om1_0, phi2_0, om2_0 = 0.00631, 0.03685, 0.00000, 2.85528
 
-    # l, mu = 1, 0.05
+    l, mu = 1, 0.05
     # phi1_0, om1_0, phi2_0, om2_0 = 2 * pi / 9, 0, 2 * pi / 9 * sqrt(2), 0  # loop
-    # phi1_0, om1_0, phi2_0, om2_0 = -0.31876, 0.54539, 0., 1.08226  # loop
+    phi1_0, om1_0, phi2_0, om2_0 = -0.31876, 0.54539, 0., 1.08226  # loop
     # phi1_0, om1_0, phi2_0, om2_0 = 0.000, 0.642, -0.485, 0.796  # loop
     # phi1_0, om1_0, phi2_0, om2_0 = -0.68847079, -0.00158915, -0.9887163, 0.00234737  # loop
     # phi1_0, om1_0, phi2_0, om2_0 = 0.000, 0.617, 1.488, -0.791  # 1 ; 0.05 ; good
@@ -249,16 +253,16 @@ def __main__(what_to_do=0):
     # l, mu = 3., 0.9
     # phi1_0, om1_0, phi2_0, om2_0 = 0.000, 3.156, 0.004, -1.074
 
-    l, mu = 5., 0.2
+    # l, mu = 5., 0.2
     # phi1_0, om1_0, phi2_0, om2_0 = 0.00000, 0.87736, -1.67453, -0.05226
     # phi1_0, om1_0, phi2_0, om2_0 = 0.00000, 0.90244, 0.43123, 0.48978
-    phi1_0, om1_0, phi2_0, om2_0 = 0.00000, 2.67628, 0.01220, -0.30299
+    # phi1_0, om1_0, phi2_0, om2_0 = 0.00000, 2.67628, 0.01220, -0.30299
 
     U0 = np.array([phi1_0, om1_0, phi2_0, om2_0])
     t, phi1, phi2, om1, om2, params, v_params = db_pendulum_solver(U0, l, mu, Tend=Tend, sps=720, l1=l1, m1=m1)
 
     if what_to_do == 0:
-        see_animation(t, phi1, phi2, om1, om2, params, v_params, (12, 6), save=False, inside=True)
+        see_animation(t, phi1, phi2, om1, om2, params, v_params, (12, 6), save="gif", inside=True)
     else:
         m2, l2 = m1 * mu / (1 - mu), l1 * l
         x1, y1 = l1 * sin(phi1), -l1 * (cos(phi1))
@@ -301,7 +305,7 @@ def __main__(what_to_do=0):
         parameters[0] = r"Axe x : $x_2$"
         parameters[1] = r"Axe y : $y_2$"
         parameters[2] = r"Axe c : $v_2$"
-        see_path_1(1, np.array([x2, y2]), ac2, color='jet', var_case=1,  shift=(0., 0.), save="no", displayedInfo=parameters)
+        # see_path_1(1, np.array([x2, y2]), ac2, color='jet', var_case=1,  shift=(0., 0.), save="no", displayedInfo=parameters)
 
         # see_path_1(1., np.array([phi1, om1]), v2, color='viridis', shift=(0., -0.), var_case=2, save="no", displayedInfo=parameters, name='1')
         # see_path_1(1., np.array([phi1, om2]), v1, color='viridis', shift=(-0., -0.), var_case=2, save="no", displayedInfo=parameters, name='2')

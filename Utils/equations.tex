@@ -1,5 +1,8 @@
 \documentclass[preview, border={15pt 10pt 15pt 0pt}]{standalone}
 
+%%%%%%%%% END { system('convert -density 300 equations.pdf myImage.png'); }
+%%%%%%%%% gswin64c.exe -sDEVICE=pngalpha -o ode_driven.png -r300 equations.pdf
+
 %\usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
 \usepackage{physics}
@@ -9,41 +12,39 @@
 
 \begin{document}
 
-\begin{align*}
-    1 + 1 = 2
-\end{align*}
+$1+1=2$
 
 \end{document}
 
-{\Huge  % Atwood's pendulum
+{ \Large % Atwood's pendulum
 \begin{align*}
     (\mu+1) \ddot{r} - r \dot{\vartheta}^2 + g(\mu - \cos \vartheta) &= 0\\
     r \ddot{\vartheta} +2 \dot{r} \dot{\vartheta} + g \sin{\vartheta} &= 0
 \end{align*}
 }
 
-{\Huge  % Falling Cylinder
+{\Large  % Falling Cylinder
 \begin{align*}
     \ddot{x} &= (m+M) g \sin \alpha + \frac{\tau}{R} + ML \dot{\vartheta}^2 \cos{\vartheta} + M g \sin{\vartheta} \cos{\left(\alpha + \vartheta \right)}\\
     L \ddot{\vartheta} &= g \cos{\left(\alpha + \vartheta \right)} + \ddot{x} \sin{\vartheta}
 \end{align*}
 }
 
-{\Huge  % Nested disks
+{\Large  % Nested disks
 \begin{align*}
     2\left[3M + m \left(2 - \sin \vartheta - \sin^2{\vartheta} \right) \right] \ddot{\vartheta} &= \frac{(4M+3m)g}{R-r} \cos \vartheta + m \; \dot{\vartheta}^2 \left(1 + 2\sin \vartheta \right)\cos \vartheta\\
     \left[4M + 3m\right] \ddot{x} &= m (R-r) \left[2\dot{\vartheta}^2 \cos \vartheta + \ddot{\vartheta} (1 + 2\sin \vartheta)\right]
 \end{align*}
 }
 
-{\Huge  % Driven pendulum
+{\Large  % Driven pendulum
 \begin{align*}
     \ddot{\varphi_2} &= -\frac{\ell_1}{\ell_2}\: \dot{\varphi_1}^2 \sin{\varphi_2} - \frac{g}{\ell_2} \sin{\left( \varphi_1(t) + \varphi_2 \right)}\\[8pt]
     \varphi_1(t) &= \varphi_1(0) + \omega t
 \end{align*}
 }
 
-{\Huge  % Driven pendulum dimensionLESS
+{\Large  % Driven pendulum dimensionLESS
 \begin{align*}
     \lambda \ddot{\varphi_2} &= -\dot{\varphi_1}^2 \sin{\left(\varphi_2 - \varphi_1\right)} - \sin{\varphi_2}\\[8pt]
     \varphi_1(\tau) &= \varphi_1(0) + \omega \tau\\
@@ -51,14 +52,14 @@
 \end{align*}
 }
 
-{\Huge  % Elastic pendulum
+{\Large  % Elastic pendulum
 \begin{align*}
     (r + \ell) \ddot{\vartheta} &= -2 \dot{x} \dot{\vartheta} - g \sin{\vartheta}\\
     \ddot{r} &= (r+\ell) \dot{\vartheta}^2 + g \cos{\vartheta} - \frac{k}{m} \: r
 \end{align*}
 }
 
-{\Huge  % Horizontal pendulum
+{\Large  % Horizontal pendulum
 \begin{align*}
     (M + m\sin^2{\varphi})\ddot{x} &= F(t) + m (g \cos \varphi - \ell \dot{\varphi}^2) \sin \varphi\\[5pt]
     \ell \ddot{\varphi} &= \ddot{x} \cos{\varphi} + g \sin{\varphi}\\[10pt]
@@ -66,7 +67,7 @@
 \end{align*}
 }
 
-{\Huge  % Vertical pendulum
+{\Large  % Vertical pendulum
 \begin{align*}
     (M + m\cos^2{\varphi})\ddot{y} &= F(t) - gm \sin^2 \varphi - m \ell \dot{\varphi}^2 \cos{\vartheta} \\[5pt]
     \ell \ddot{\varphi} &= (g - \ddot{y}) \sin{\varphi}\\[10pt]
@@ -74,7 +75,7 @@
 \end{align*}
 }
 
-{\Huge  % Foucault pendulum
+{\Large  % Foucault pendulum
 \begin{align*}
     \ddot{\alpha} &= \dot{\beta}^2 \sin \alpha \cos \alpha - \frac{g}{\ell} \sin \alpha + 2 \Omega \dot{\beta} \Big[ \sin \phi \sin \alpha \cos \alpha + \cos \phi \sin^2 \alpha \cos \beta \Big]\\[5pt]
     \ddot{\beta}  \sin \alpha &= -2\dot{\alpha} \dot{\beta} \cos \alpha - 2 \Omega \dot{\alpha} \Big[\sin \phi \cos \alpha + \cos \phi \sin \alpha \cos{\beta} \Big]\\[10pt]
@@ -82,93 +83,143 @@
 \end{align*}
 }
 
-{\Huge  % Triple pendulum EXPLICIT
+{\Large  %Triple pendulum EXPLICIT
 \begin{align*}
-    M = m_1 + m_2 + m_3 \qquad m = m_2 + m_3 \qquad c_{ij} = \cos{\left(\varphi_i - \varphi_j\right)} \qquad s_{ij} = \sin{\left(\varphi_i - \varphi_j\right)}&\\[50pt]
+    M = m_1 + m_2 + m_3 \qquad m = m_2 + m_3 \qquad c_{ij} = \cos{\left(\varphi_i - \varphi_j\right)} \qquad s_{ij} = \sin{\left(\varphi_i - \varphi_j\right)}&\\[30pt]
     %%%%%%%%%%%%%%%%
     \ell_1 \dot{\varphi_1}^2 (-m \: s_{21} + m_3 \: s_{31} \: c_{32})
         + m_3 \:\ell_2\: \dot{\varphi}_2^2 \: s_{32} \: c_{32}
         + m_3 \:\ell_3\: \dot{\varphi}_3^2 \: s_{32}
         - m g \:\sin\varphi_2
         + m_3 g\: \sin \varphi_3 \: c_{32}
-    &= q_a\\[15pt]
+    &= q_a\\[10pt]
     %%%%%%%%%%%%%%%%
     m \ell_2 \: \dot{\varphi_2}^2 \: s_{21} + m_3 \: c_{31} \left[
         g \sin{\varphi_3} + \ell_2 \: \dot{\varphi}_2^2 \: s_{32} + \ell_1 \: \dot{\varphi_1}^2 \: s_{31}
-    \right] + m_3 \ell_3 \: \dot{\varphi}_3^2 \: s_{31} - M g \: \sin{\varphi}_1 &= q_b\\[15pt]
+    \right] + m_3 \ell_3 \: \dot{\varphi}_3^2 \: s_{31} - M g \: \sin{\varphi}_1 &= q_b\\[10pt]
     %%%%%%%%%%%%%%%%
     \ell_1 \dot{\varphi}_1^2
         \left[-m \: s_{21} + m_3 \: s_{31} \: c_{32} \right]
     + m_3 \ell_2 \: \dot{\varphi}_2^2 \: s_{32} \: c_{32}
     + m_3 \ell_3 \: \dot{\varphi}_3^2 \: s_{32}
     - m g \: \sin \varphi_2
-    + m_3 g \: \sin \varphi_3 \: c_{32} &= q_c\\[15pt]
+    + m_3 g \: \sin \varphi_3 \: c_{32} &= q_c\\[10pt]
     %%%%%%%%%%%%%%%%
-    -g \sin \varphi_3 - \ell_2 \: \dot{\varphi}_2^2 \: s_{32} - \ell_2 \ddot{\varphi}_2 \: c_{32} - \ell_1 \dot{\varphi}_1^2 \: s_{31} - \ell_1 \ddot{\varphi}_1 \: c_{31} &= q_d \\[50pt]
+    -g \sin \varphi_3 - \ell_2 \: \dot{\varphi}_2^2 \: s_{32} - \ell_2 \ddot{\varphi}_2 \: c_{32} - \ell_1 \dot{\varphi}_1^2 \: s_{31} - \ell_1 \ddot{\varphi}_1 \: c_{31} &= q_d \\[30pt]
     %%%%%%%%%%%%%%%%
     \ell_1 \left[
         m_1 + m_2 + m_3 \: s_{31}^2 - \frac{(m \: c_{21} - m_3 \: c_{31} \:c_{32})^2}{m_2 + m_3 \: s_{32}^2}
     \right] \ddot{\varphi}_1
-    &= \frac{m_3 \: c_{31} \: c_{32} - m \: c_{21}}{m_2 + m_3 \: s_{32}^2} \; q_a + q_b\\[15pt]
+    &= \frac{m_3 \: c_{31} \: c_{32} - m \: c_{21}}{m_2 + m_3 \: s_{32}^2} \; q_a + q_b\\[10pt]
     %%%%%%%%%%%%%%%%
-    \ell_2 \Big[ m_2 + m_3 \: s_{32}^2 \Big] \ddot{\varphi}_2 &= 
-    \ell_1 \ddot{\varphi}_1 
+    \ell_2 \Big[ m_2 + m_3 \: s_{32}^2 \Big] \ddot{\varphi}_2 &=
+    \ell_1 \ddot{\varphi}_1
         \left[-m \: c_{21} + m_3 \: c_{31} \: c_{32} \right]
-    + q_c\\[15pt]
+    + q_c\\[10pt]
     \ell_3 \; \ddot{\varphi}_3 &= q_d
 \end{align*}
 }
 
-{\Huge  % Simple pendulum
+{\Large  % Simple pendulum
 \begin{equation*}
     \ddot{\varphi} = -\frac{g}{L} \sin \varphi
 \end{equation*}
 }
 
-{\Huge  % Rectangular Membrane
+{\Large  % Rectangular Membrane
 \begin{align*}
-    \pdv[2]{u}{t} + h \pdv{u}{t} &= c^2 \left( \pdv[2]{u}{x} + \pdv[2]{u}{y} \right) \qquad \forall (x,y) \in \Omega = [0, L] \times [0, H]\\[50pt]
-    u(x, y, t) &= 0 \;\:\qquad\qquad \forall (x, y) \in \partial \Omega \quad \forall t \in [0, T]\\[15pt]
-    u(x, y, 0) &= f(x,y) \qquad \forall (x, y) \in \Omega\\[50pt]
-    u(x,y) &= \sum_{i,j = 1}^{\infty} T_{ij}(t) \, \sin{(p_i \, x)} \sin{(q_j \, y)}\\[20pt]
-    p_{i} &= \frac{i\pi}{L} \qquad q_{j} = \frac{j\pi}{H} \qquad k_{ij} = \sqrt{p_i^2 + q_j^2}\\[20pt]
-    \alpha_{1,2} &= -h \pm \sqrt{h^2 - c^2\: k_{ij}^2} \qquad \beta = \sqrt{c^2\: k_{ij}^2 - h^2}\\[20pt]
-    I &= \frac{4}{LH} \iint_{\Omega} f(x,y)  \sin{(p_i \: x)} \sin{(q_j\: y)} \diff \Omega\\[20pt]
-    T_{ij} &= 
+    \pdv[2]{u}{t} + h \pdv{u}{t} &= c^2 \left( \pdv[2]{u}{x} + \pdv[2]{u}{y} \right) \qquad \forall (x,y) \in \Omega = [0, L] \times [0, H]\\[30pt]
+    u(x, y, t) &= 0 \;\:\qquad\qquad \forall (x, y) \in \partial \Omega \quad \forall t \in [0, T]\\[10pt]
+    u(x, y, 0) &= f(x,y) \qquad \forall (x, y) \in \Omega\\[30pt]
+    u(x,y) &= \sum_{i,j = 1}^{\infty} T_{ij}(t) \, \sin{(p_i \, x)} \sin{(q_j \, y)}\\[10pt]
+    p_{i} &= \frac{i\pi}{L} \qquad q_{j} = \frac{j\pi}{H} \qquad k_{ij} = \sqrt{p_i^2 + q_j^2}\\[10pt]
+    \alpha_{1,2} &= -h \pm \sqrt{h^2 - c^2\: k_{ij}^2} \qquad \beta = \sqrt{c^2\: k_{ij}^2 - h^2}\\[10pt]
+    I &= \frac{4}{LH} \iint_{\Omega} f(x,y)  \sin{(p_i \: x)} \sin{(q_j\: y)} \diff \Omega\\[10pt]
+    T_{ij} &=
     \begin{cases}
-        \frac{I}{\alpha_2 - \alpha_1} \; \Big[\alpha_2 e^{\alpha_1 \,t} - \alpha_1 e^{\alpha_2 \, t}\Big] & \text{if } c\,k_{ij} < h\\[15pt]
-        I \,e^{-h\,t} \Big[\cos(\beta t) + \frac{h}{\beta} \sin (\beta t)\Big]  & \text{if } c\,k_{ij} > h\\[15pt]
+        \frac{I}{\alpha_2 - \alpha_1} \; \Big[\alpha_2 e^{\alpha_1 \,t} - \alpha_1 e^{\alpha_2 \, t}\Big] & \text{if } c\,k_{ij} < h\\[7pt]
+        I \,e^{-h\,t} \Big[\cos(\beta t) + \frac{h}{\beta} \sin (\beta t)\Big]  & \text{if } c\,k_{ij} > h\\[7pt]
         I e^{-h t} \:\, \Big[1 + ht\Big] & \text{if } c\, k_{ij} = h\\
     \end{cases}
 \end{align*}
 }
 
-{\Huge  % Circular Membrane
+{\Large  % Circular Membrane
 \begin{align*}
-    \pdv[2]{u}{t} + h \pdv{u}{t} &= c^2 \left[ \frac{1}{r}\pdv{}{r} \, \left(r \pdv{u}{r}\right) + \frac{1}{r^2}\,\pdv[2]{u}{\theta} \right] \qquad \forall (r,\theta) \in \Omega = [0, 0] \times [R, 2\pi]\\[50pt]
-    u(r, \theta, t) &= 0 \;\:\qquad\qquad \forall (r, \theta) \in \partial \Omega \quad \forall t \in [0, T]\\[15pt]
-    u(r, \theta, 0) &= f(r, \theta) \qquad \forall (r, \theta) \in \Omega\\[50pt]
-    u(r,\theta) &= \sum_{i,j = 0}^{\infty} T_{ij}(t) \, R_{ij}(r) \, \Theta_{ij}(\theta)\\[50pt]
-    R\, k_{ij} &= j^{\textrm{th}} \text{ root of Bessel function } J_i\\[20pt]
-    \alpha_{1,2} &= -h \pm \sqrt{h^2 - c^2\: k_{ij}^2} \qquad \beta = \sqrt{c^2\: k_{ij}^2 - h^2}\\[20pt]
-    I_c &= \iint_{\Omega} r\, f(r,\theta) \, J_i(k_{ij} r) \cos{(i \theta)} \diff \Omega\\[20pt]
-    I_s &= \iint_{\Omega} r\, f(r,\theta) \, J_i(k_{ij} r) \sin{(i \theta)} \diff \Omega\\[20pt]
+    \pdv[2]{u}{t} + h \pdv{u}{t} &= c^2 \left[ \frac{1}{r}\pdv{}{r} \, \left(r \pdv{u}{r}\right) + \frac{1}{r^2}\,\pdv[2]{u}{\theta} \right] \qquad \forall (r,\theta) \in \Omega = [0, 0] \times [R, 2\pi]\\[30pt]
+    u(r, \theta, t) &= 0 \;\:\qquad\qquad \forall (r, \theta) \in \partial \Omega \quad \forall t \in [0, T]\\[10pt]
+    u(r, \theta, 0) &= f(r, \theta) \qquad \forall (r, \theta) \in \Omega\\[30pt]
+    u(r,\theta) &= \sum_{i,j = 0}^{\infty} T_{ij}(t) \, R_{ij}(r) \, \Theta_{ij}(\theta)\\[30pt]
+    R\, k_{ij} &= j^{\textrm{th}} \text{ root of Bessel function } J_i\\[10pt]
+    \alpha_{1,2} &= -h \pm \sqrt{h^2 - c^2\: k_{ij}^2} \qquad \beta = \sqrt{c^2\: k_{ij}^2 - h^2}\\[10pt]
+    I_c &= \iint_{\Omega} r\, f(r,\theta) \, J_i(k_{ij} r) \cos{(i \theta)} \diff \Omega\\[10pt]
+    I_s &= \iint_{\Omega} r\, f(r,\theta) \, J_i(k_{ij} r) \sin{(i \theta)} \diff \Omega\\[10pt]
     I_n &= \begin{cases}
-        \frac{1}{2\pi} \: I_c & \text{ if } i = 0\\[15pt]
-        \frac{1}{\pi} \: I_s & \text{ if } i > 0\\[15pt]
-    \end{cases} 
-    \qquad  I_d = \iint_{\Omega} r\, J_i^2(k_{ij} r) \diff \Omega\\[50pt]
-    R_{ij}(r) &= J_i(k_{ij} r)\\[20pt]
-    \Theta_{ij}(\theta) &= 
+        \frac{1}{2\pi} \: I_c & \text{ if } i = 0\\[7pt]
+        \frac{1}{\pi} \: I_s & \text{ if } i > 0\\[7pt]
+    \end{cases}
+    \qquad  I_d = \iint_{\Omega} r\, J_i^2(k_{ij} r) \diff \Omega\\[30pt]
+    R_{ij}(r) &= J_i(k_{ij} r)\\[10pt]
+    \Theta_{ij}(\theta) &=
     \begin{cases}
         1 & \text{if } i = 0\\
         \frac{I_c}{I_s} \cos{(i \theta)} + \sin{(i\theta)} & \text{if } i > 0\\
-    \end{cases}\\[20pt]
-    T_{ij} &= 
+    \end{cases}\\[10pt]
+    T_{ij} &=
     \begin{cases}
-        \frac{I_n}{I_d} \: \frac{1}{\alpha_2 - \alpha_1} \; \Big[\alpha_2 e^{\alpha_1 \,t} - \alpha_1 e^{\alpha_2 \, t}\Big] & \text{if } c\,k_{ij} < h\\[15pt]
-        \frac{I_n}{I_d}\: e^{-h\,t} \Big[\cos(\beta t) + \frac{h}{\beta} \sin (\beta t)\Big]  & \text{if } c\,k_{ij} > h\\[15pt]
+        \frac{I_n}{I_d} \: \frac{1}{\alpha_2 - \alpha_1} \; \Big[\alpha_2 e^{\alpha_1 \,t} - \alpha_1 e^{\alpha_2 \, t}\Big] & \text{if } c\,k_{ij} < h\\[7pt]
+        \frac{I_n}{I_d}\: e^{-h\,t} \Big[\cos(\beta t) + \frac{h}{\beta} \sin (\beta t)\Big]  & \text{if } c\,k_{ij} > h\\[7pt]
         \frac{I_n}{I_d} \: e^{-h t} \:\, \Big[1 + ht\Big] & \text{if } c\, k_{ij} = h\\
     \end{cases}
+\end{align*}
+}
+
+{\Large
+\begin{align*}  % Group velocity
+    k &= \frac{2\pi}{\lambda} \qquad \omega(k) = k \, v(k) \qquad v_p = \frac{\omega}{k} \qquad v_g = \dv{\omega}{k} \qquad n(\lambda) = \frac{c}{v_p(\lambda)}\\[10pt]
+    E_i(x,t) &= \sin\left( k_i x - \omega_i t \right)  \qquad\text{where}\qquad k_i = \frac{2\pi}{\lambda_i} = \frac{\omega_i}{v_i} = \frac{\omega_i}{c/n_i} \qquad i = 1,2\\[10pt]
+    E_1(x,t) + E_2(x,t) &= 2\, \sin \left[\frac{k_2+k_1}{2} \: \left(x - \frac{\omega_2 + \omega_1}{k_2 + k_1} \: t\right) \right] \cos\left[\frac{k_2-k_1}{2} \: \left(x - \frac{\omega_2 - \omega_1}{k_2 - k_1} \: t\right) \right]\\
+    &= 2 \, f(x - v_p\,t)\: g(x - v_g \, t)
+\end{align*}
+}
+
+{\Large
+\begin{align*}  % Group velocity
+    k &= \frac{2\pi}{\lambda} \qquad \omega(k) = k \, v(k) \qquad v_p = \frac{\omega}{k} \qquad v_g = \dv{\omega}{k} \qquad n(\lambda) = \frac{c}{v_p(\lambda)}\\[20pt]
+    E_i(x,t) &= \sin\left( k_i x - \omega_i t \right)  \qquad\text{where}\qquad k_i = \frac{2\pi}{\lambda_i} = \frac{\omega_i}{v_i} = \frac{\omega_i}{c/n_i} \qquad i = 1,2\\[10pt]
+    E_1(x,t) + E_2(x,t) &= 2\, \sin \left[\frac{k_2+k_1}{2} \: \left(x - \frac{\omega_2 + \omega_1}{k_2 + k_1} \: t\right) \right] \cos\left[\frac{k_2-k_1}{2} \: \left(x - \frac{\omega_2 - \omega_1}{k_2 - k_1} \: t\right) \right]\\
+    &= 2 \, f(x - v_p\,t)\: g(x - v_g \, t)
+\end{align*}
+}
+
+{\Large
+\begin{align*} % Double pendulum
+    \vartheta = \varphi_1 - \varphi_2 \qquad \mu &= \frac{m_2}{m_1+m_2} \qquad \lambda = \frac{\ell_2}{\ell_1} \qquad \tau = \sqrt{\frac{g}{\ell_1}} \, t\\[25pt]
+    \begin{bmatrix}
+        (m_1+m_2) \ell_1^2 & m_2 \ell_1\ell_2 \cos \vartheta\\
+        m_2\ell_1\ell_2 \cos \vartheta & m_2\ell_2^2
+    \end{bmatrix}
+    \begin{bmatrix}
+        \ddot{\varphi}_1\\
+        \ddot{\varphi}_2
+    \end{bmatrix} &=
+    \begin{bmatrix}
+    -m_2 \ell_1 \ell_2 \dot{\varphi_2}^2 \, \sin \vartheta - (m_1 + m_2) g \ell_1 \, \sin \varphi_1\\
+    m_2\ell_1\ell_2 \dot{\varphi_1}^2 \, \sin \vartheta - m_2 g \ell_2 \, \sin \varphi_2\\
+    \end{bmatrix}\\[25pt]
+    \begin{bmatrix}
+        1 & \mu \lambda \cos \vartheta\\
+        \cos \vartheta & \lambda
+    \end{bmatrix}
+    \begin{bmatrix}
+        \ddot{\varphi}_1\\
+        \ddot{\varphi}_2
+    \end{bmatrix} &=
+    \begin{bmatrix}
+    -\mu \lambda \dot{\varphi_2}^2 \, \sin \vartheta - \sin \varphi_1\\
+    \dot{\varphi_1}^2 \, \sin \vartheta - \sin \varphi_2\\
+    \end{bmatrix}\\[25pt]
+    \big[1 - \mu \cos^2 \vartheta \big]\ddot{\varphi}_1 &= \mu \cos \vartheta \big(\sin \varphi_2 - \dot{\varphi}_1^2 \sin \vartheta\big) - \lambda \mu \dot{\varphi}_2^2 \sin \vartheta - \sin \varphi_1\\[5pt]
+    \lambda \big[1 - \mu \cos^2 \vartheta \big]\ddot{\varphi}_2 &= \sin \vartheta \big(\cos \varphi_1 + \dot{\varphi}_1^2 + \lambda \mu \dot{\varphi}_2^2 \cos \vartheta \big)\\
 \end{align*}
 }

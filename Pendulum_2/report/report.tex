@@ -1,0 +1,306 @@
+\documentclass[11 pt]{article}
+\usepackage{structure}
+
+\title{%
+LINMA2361 - Nonlinear Dynamical Systems - Project\\
+A detailed analysis of the double pendulum
+}
+
+\author{DEGROOFF Vincent \quad -- \quad NOMA : 09341800}
+\date{Thursday 20th January 2022}
+
+\begin{document}
+
+\maketitle
+
+%\vspace{-3mm}
+\section{Introduction}
+The double pendulum is a rather popular dynamical system as evidenced by both the literature and the many simulations available on the internet. Articles and books treat this subject mostly for academic purposes. In fact, this mechanical system is very well suited to the analysis by the tools of nonlinear dynamics. It exhibits different types of behavior - periodic, quasiperiodic, chaotic - but it remains simple enough with only $4$ state variables. Many variants of the double pendulum have already been studied: distributed masses along a rod \cite{enwikiDoublePendulum} or a square plate \cite{squareDblPendulum}, coupled double pendulum \cite{mastersthesis}, motion in 3 dimensions \cite{DoublePendulum3D}, etc. However, the basic case with two point masses is often only studied for equal masses and rods of equal lengths \cite{ChaosPC} \cite{codeproject} \cite{STACHOWIAK2006417}. This work will try to study  the impact that different masses and rod lengths can have on the dynamics of the pendulum.
+
+First, in section 2, I present the system and derive its state space model in dimensionless form. In section 3, I briefly analyze its equilibria. Then, the potential energy of the system is represented on the 2-torus in section 4. Finally, I produce Poincaré sections for various lengths, masses and energies in section 5.
+
+\section{Overview of the system}
+
+\subsection{Description}
+\begin{figure}[htp]
+    \centering
+    \includesvg[width=\textwidth]{Figures/description.svg}
+    \caption{Description of the double pendulum.}
+    \label{fig:description}
+\end{figure}
+
+The double pendulum is presented in figure \ref{fig:description}. This version of the double pendulum consists of two point masses of masses $m_1$, $m_2$. The inner mass $P_1$ is linked to a fixed point by a rod of length $\ell_1$ and the external mass $P_2$ is linked to $P_1$ by a rod of length $\ell_2$. The angles $\varphi_1$, $\varphi_2$ are defined in absolute position. The angular velocities are noted $\dot \varphi_1$ and $\dot \varphi_2$. The system is placed in a uniform gravitational field $\Vec{g}$ in the direction $-y$. The system is planar.
+
+\subsection{Equations of motion}
+In order to obtain the equations of motion of this system, we will use the Lagrangian approach. The Lagrangian $\mathcal{L}$ is defined by the kinetic energy $\mathcal{K}$ and the potential energy $\mathcal{U}$. We also define the total energy of the system $\mathcal{E}$:
+\begin{equation*}
+\begin{aligned}
+    \mathcal{K} &=\frac{m_1}{2} \ell_1^2 \dot \varphi_1^2 + \frac{m_2}{2} \left[ \ell_1^2\, \dot \varphi_1^2 + \ell_2^2\, \dot \varphi_2^2  + 2 \ell_1 \ell_2 \, \dot \varphi_1 \dot \varphi_2 \cos{\left(\varphi_1 - \varphi_2\right)}\right]\\
+    \mathcal{U} &= \left(m_1+m_2\right)g \ell_1 \left(1 - \cos{\varphi_1}\right) + m_2 g \ell_2 \left(1 - \cos \varphi_2\right)\\
+    \mathcal{L} &= \mathcal{K} - \mathcal{U}\\
+    \mathcal{E} &= \mathcal{K} + \mathcal{U}\\
+\end{aligned}
+\end{equation*}
+
+Since we deal with a system where all the forces are conservative, we can use this version of the Euler–Lagrange equations:
+\begin{equation*}
+\begin{aligned}
+    \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial \mathcal{L}}{\partial \dot \varphi_i} - \frac{\partial \mathcal{L}}{\partial \varphi_i} &= 0
+\end{aligned}
+\end{equation*}
+
+We obtain two equations related to the derivatives with respect to $\varphi_1, \dot \varphi_1$ and $\varphi_2, \dot \varphi_2$, where we introduced the variable $\theta \coloneqq \varphi_1 - \varphi_2$ to simplify the notations:
+\small{
+\begin{align*}
+    \frac{\mathrm{d}}{\mathrm{d}t} \Big[m_1 \ell_1^2 \dot \varphi_1 + m_2 \left(\ell_1^2 \dot \varphi_1 + \ell_1 \ell_2 \dot \varphi_2 \cos \theta \right)\Big] &= \Big[-m_2 \ell_1 \ell_2 \dot \varphi_1 \dot \varphi_2 \sin{\theta} - (m_1+m_2)g \ell_1 \sin \varphi_1 \Big]\\
+    \frac{\mathrm{d}}{\mathrm{d}t} \Big[m_2 \ell_2^2 \dot \varphi_2 + m_2\ell_1 \ell_2 \dot \varphi_1 \cos \theta \Big] &= \Big[m_2 \ell_1 \ell_2 \dot \varphi_1 \dot \varphi_2 \sin{\theta} - m_2 g \ell_2 \sin \varphi_2\Big]
+\end{align*}
+}
+\normalsize
+
+This can be reduced to:
+\begin{align}
+    (m_1+m_2) \ell_1 \ddot \varphi_1 + m_2 \ell_2 \ddot \varphi_2 \cos \theta &= -m_2 \ell_2 \dot \varphi_2^2 \sin \theta - (m_1+m_2) g \sin \varphi_1\label{eq:state_1}\\
+    \ell_1 \ddot \varphi_1 \cos \theta + \ell_2 \ddot \varphi_2 &= \ell_1 \dot \varphi_1^2\sin{\theta} - g \sin \varphi_2\label{eq:state_2}
+\end{align}
+%&= m_1\ell_1^2 \ddot \varphi_1 + m_2 \left(\ell_1^2 \ddot \varphi_1 + \ell_1 \ell_2 \ddot \varphi_2 \cos \theta - \ell_1 \ell_2 \dot \varphi_2 (\dot \varphi_1 - \dot \varphi_2) \sin \theta  \right)\\
+%&\iff (m_1+m_2) \ell_1^2 \ddot \varphi_1 + m_2 \ell_1 \ell_2 \ddot \varphi_2 \cos \theta = -m_2 \ell_1 \ell_2 \dot \varphi_2^2 \sin \theta - (m_1+m_2) g \ell_1 \sin \varphi_1 
+
+\subsection{Dimensionless Formulation}
+We can reduce the set of $5$ parameters $m_1, m_2, \ell_1, \ell_2, g$ down to $2$ parameters $\lambda, \mu$ using an appropriate time scaling $\tau$:
+\begin{align*}
+    \lambda = \frac{\ell_2}{\ell_1} \qquad \mu  = \frac{m_2}{m_1+m_2} \qquad \tau = \sqrt{\frac{g}{\ell_1}} t
+\end{align*}
+
+We can now derive the new state equations using \eqref{eq:state_1} and \eqref{eq:state_2}:
+\begin{align}
+    \ddot \varphi_1 + \mu \lambda \ddot \varphi_2 \cos \theta &= - \mu \lambda \dot \varphi_2^2 \sin \theta - \sin \varphi_1\\
+    \ddot \varphi_1 \cos \theta + \lambda \ddot \varphi_2 &= \dot \varphi_1^2 \sin \theta - \sin \varphi_2
+\end{align}
+
+The system can be formulated in the classical state-space paradigm with $x=(\varphi_1, \varphi_2, \omega_1, \omega_2)$:
+\begin{align}
+    f(x)=
+    \frac{\mathrm{d}}{\mathrm{d}t}
+    \begin{bmatrix}
+        \varphi_1\\[2pt]
+        \varphi_2\\[2pt]
+        \omega_1\\[2pt]
+        \omega_2
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        \omega_1\\[2pt]
+        \omega_2\\[2pt]
+        \left[\mu \cos \theta (\sin \varphi_2 - \omega_1^2 \sin \theta) - \lambda \mu \omega_2^2 \sin \theta - \sin \varphi_1\right]\frac{1}{1 - \mu \cos^2\theta}\\[2pt]
+        \frac{1}{\lambda} \sin \theta \left[\cos \varphi_1 + \omega_1^2 + \lambda \mu \omega_2^2 \cos \theta \right]\frac{1}{1 - \mu \cos^2\theta}\\[2pt]
+    \end{bmatrix}
+\end{align}
+
+The energy can also be nondimensionalized with a \textit{reference energy} $\mathcal{E}_0 \coloneqq (m_1+m_2) g \ell_1$:
+\begin{equation}
+\begin{aligned}
+    E \coloneqq \mathcal{E}/\mathcal{E}_0 = \frac{1}{2}\dot \varphi_1^2 + \frac{1}{2}\mu [\lambda^2 \dot \varphi_2^2 + 2 \lambda \dot \varphi_1 \dot \varphi_2 \cos \theta] + (1 - \cos \varphi_1) + \mu \lambda (1 - \cos \varphi_2)
+\end{aligned}\label{eq:energy}
+\end{equation}
+
+%*2/(Mgl1)
+% 1/2 (m_1+m_2) \ell_1 g \dot \varphi_1^2 + m_2/2 [\ell_2^2 g / l1 \dot \varphi_2^2 + 2 \ell_2 g \dot \varphi_1 \dot \varphi_2 \cos \theta] + (m_1+m_2)g \ell_1 (1 - \cos \varphi_1) + m_2 g \ell_2 (1 - \cos \varphi_2)\\
+
+\section{Equilibria}
+\begin{equation}
+    (\varphi_1, \omega_1, \varphi_2, \omega_2) =
+    \begin{cases}
+        & (0, 0, 0, 0) \quad \rightarrow \quad E_1 = 0\\
+        & (0, \pi, 0, 0) \quad \rightarrow \quad E_2 = 2\mu \lambda\\
+        & (\pi, 0, 0, 0) \quad \rightarrow \quad E_3 = 2\\
+        & (\pi, \pi, 0, 0) \quad \rightarrow \quad E_4 = 2(1+\mu \lambda)
+    \end{cases} \quad
+    \begin{aligned}
+        &\text{down-down}\\
+        &\text{down-up}\\
+        &\text{up-down}\\
+        &\text{up-up}
+    \end{aligned}
+    \label{eq:equilibria}
+\end{equation}
+are the $4$ fixed points of the system obtained by solving $f(x)=0$ for $x$. We can then compute the Jacobian matrix associated to theses four equilibria. Each sign corresponds to one of the equilibria of equation \eqref{eq:equilibria} with the same order from top to bottom. The $4$ eigenvalues are denoted $\alpha_i$ for $i=1,2,3,4$.
+\begin{align}
+    J(q) =
+    \begin{bmatrix}
+        0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 1\\
+        \mathrel{\substack{-\\-\\+\\+}} \frac{1}{1-\mu} & \mathrel{\substack{-\\-\\+\\+}}\frac{\mu}{1 - \mu} & 0 & 0\\
+        \mathrel{\substack{+\\-\\-\\+}}\frac{1}{\lambda(1-\mu)} & \mathrel{\substack{+\\-\\+\\-}}\frac{1}{\lambda(1 - \mu)} & 0 & 0
+    \end{bmatrix}
+\end{align}
+\begin{align}
+    \implies 
+    \begin{cases}
+        \alpha_1 = -\alpha_2 = \sqrt{\frac{1}{2\lambda \left(1 - \mu\right)} \left(s \mathrel{\substack{-\\-\\+\\+}} \lambda \mathrel{\substack{-\\+\\-\\+}} 1\right)}\\
+        \alpha_3 = -\alpha_4 = \sqrt{\frac{1}{2\lambda \left(1 - \mu\right)} \left(-s \mathrel{\substack{-\\-\\+\\+}} \lambda \mathrel{\substack{-\\+\\-\\+}} 1\right)}
+    \end{cases} \quad
+    \text{with} \quad s = \sqrt{\lambda^2 + 4\lambda \mu - 2 \lambda + 1} \label{eq:eigenvalues}
+    %\text{where} \qquad s \coloneqq \sqrt{\lambda^2+4\lambda \mu - 2 \lamda + 1}
+\end{align}
+
+%\vspace{-5mm}
+\begin{figure}[htp]
+    \centering
+    \includesvg[width=\textwidth]{Figures/eigenvalues_latex_2.00.svg}
+    \caption{Complex representation of the eigenvalues of the Jacobian at the $4$ equilibria. The eigenvalues were computed for $\lambda=2$ and for multiple values of $\mu\in [0.05, 0.95]$ whose increase is given by the direction of the arrows.}
+    \label{fig:equilibria}
+\end{figure}
+
+In figure \ref{fig:equilibria}, as expected, we observe that the last three equilibria are unstable since they have at least one eigenvalue with $\Re(\alpha_i)>0$. The stability of the first equilibrium (on the left of figure \ref{fig:equilibria}) cannot be determined by the linearization since it is a nonhyperbolic fixed-point.
+
+Its stability can however be easily determined since the double pendulum without friction is a conservative system. In fact, the energy function we derived in \eqref{eq:energy} is a conserved quantity \cite[p.160]{strogatz2018nonlinear}, i.e. $E(\mathbf{x})$ is such that $\mathrm{d}E/\mathrm{d}t=0$. Therefore, $x^{*}=(0, 0, 0, 0)$ is a nonlinear center as it is a local minimum of $E(x)$.
+
+
+\section{Potential energy on a torus}
+The nondimensionalized potential energy 
+\[V(\varphi_1, \varphi_2) \coloneqq \mathcal{U}/{\mathcal{E}_0} = (1-\cos{\varphi_1}) + \mu \lambda (1-\cos{\varphi_2})\]
+
+is obviously periodic in both variables $\varphi_1$ and $\varphi_2$. Its natural \textit{phase space} is therefore the 2-torus: $T^2 = S^1 \times S^1$, where $S^1$ denotes the 1-sphere. Of course, the complete phase space including the variables of angular velocities $\dot \varphi_1$ and $\dot \varphi_2$ is $4$-dimensional: $T^2 \times \mathbb{R}^2$. However, since the angular velocities never appear in the potential, we can forget them for the moment.
+
+We are interested in this potential because it provides information about the possible states that the system can reach. In fact, the total energy is constant and $E(x)=V(x)+K(x)$ with the kinetic energy $K(x) \geq 0$. Therefore, $V(x)$ can never be higher than the $E(x)$.
+
+In figure \ref{fig:potential_3D}, the level sets of the potential energy are represented on the 2-torus. The toroidal direction (rotation around the larger circle) is given by $\varphi_1$ and the poloidal direction (around the smaller circle) is given by $\varphi_2$. The coordinates of the four equilibria are represented by dots and increasing values of the potential are given by colors from blue to red. %the colors change from blue to red increasing with the potential.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=.97\textwidth]{Figures/potential_torus_3D.svg}
+    \vspace*{-15mm}
+    \caption{Level sets of the potential energy on a torus, with $\lambda \mu = 0.5$. }
+    \label{fig:potential_3D}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=.97\textwidth]{Figures/potential_torus_2D.svg}
+    \caption{Projected view of figure \ref{fig:potential_3D} without the $z$ component. The levels sets are represented for $4$ different values of $\mu \lambda$.}
+    \label{fig:potential_2D}
+\end{figure}
+
+We can see in figure \ref{fig:potential_3D} that the level sets split in two curves when $E_2<E<E_3$, and merge back afterwards. %When the pendulum starts with zero velocity, it can only reach states with lower or equal potential. 
+If the pendulum has an initial energy $E(x)\leq E_2$, the second pendulum will never make a full rotation. Similarly, if its initial energy $E(x)\leq E_3$, the inner pendulum will never be able to rotate completely. However, these conditions are necessary but not sufficient: if $E\big(x(0)\big) \geq E_2$, the full rotation of the second pendulum may or may not happen. 
+%$E_2 < E_3$ for $\mu \lambda < 1$ and $E_2 > E_3$ for $\mu \lambda > 1$.
+
+In order to see the impact of the product $\mu \lambda$ on the level sets, we can project them on the $x,y$ plane as if we looked at the torus from above. This is done in figure \ref{fig:potential_2D} where the point $(\varphi_1=0, \varphi_2=0)$ is placed the bottom of the plot.
+
+Using the equation \eqref{eq:equilibria}, when $\mu \lambda < 1$, the rotation of the second pendulum requires less energy than the first pendulum and reciprocally. Therefore, when $\mu \lambda = 1$, these two equilibria $E_2$ and $E_3$ lie on the same level set of the potential as we can see in the lower right subplot of figure \ref{fig:potential_2D}.
+
+
+\section{Poincaré sections}
+Since the state space is 4-dimensional, it is more convenient to reduce it to lower dimensions. One possibility is to use a \textit{Poincaré section}. The axes of such a section are some of the state variables or a combination of these. Every time a condition is satisfied, we add a point on the section, at the right coordinates.
+
+This tool is useful since it provides information about many states at once. As said in \cite{ChaosPC}:
+\begin{displayquote}
+    The Poincare section allows fast and informative insight into the dynamics of the double pendulum. The different types of motion appear as a finite number of points for periodic orbits, curve-filling points for quasiperiodic motion and area-filling points for chaotic trajectories.
+\end{displayquote}
+
+Since the course already covered the notions of periodic an chaotic trajectories, there only remains to introduce quasiperiodic trajectories. 
+
+\subsection{Quasiperiodicity}
+This type of trajectory happens when two state variables are periodic and that the ratio of their frequencies is irrational. For example, this basic system with given $\omega_1$, $\omega_2$ \cite[p. 276]{strogatz2018nonlinear}:
+\begin{align*}
+    \dot \theta_1 = \omega_1\\
+    \dot \theta_2 = \omega_2
+\end{align*}
+can exhibit both periodic and quasiperiodic behavior. On one side, when $\omega_1/\omega_2 = p/q$ where $p$ and $q$ are integers with no common factor, the trajectories are periodic of period $p \cdot 2\pi/ \omega_1 = q \cdot 2 \pi / \omega_2$. On the other side, when the ratio $\omega_1/\omega_2$ is irrational, the trajectory is no longer periodic but quasiperiodic.
+
+We can also represent this system on a torus, where $\theta_1$ is the toroidal direction and $\theta_2$ is the poloidal direction.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includesvg[width=1\textwidth]{Figures/poincare_periodic_new.svg}
+        \caption{Periodic orbit with $\omega_1=2$ and $\omega_2=3$}
+        \label{fig:poincare_periodic}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includesvg[width=\textwidth]{Figures/poincare_quasi_new.svg}
+        \caption{Quasiperiodic orbit with \\$\omega_1=2$ and $\omega_2 = 2 \sqrt{2}$}
+        \label{fig:poincare_quasi}
+    \end{minipage}
+\end{figure}
+
+The Poincaré section (in orange) was defined as all the states with $\theta_1=0$. In the periodic case, the orbit is closed and there is only a finite number of green dots on the section. In the quasiperiodic case, the orbit never closes and the intersection points of the orbit with the section will eventually fill the circle (the orbit is dense on the torus \cite[p. 279]{strogatz2018nonlinear}).  %(but never crosses itself either)
+
+\subsection{Numerical experiments}
+
+I constructed the Poincaré section of the double pendulum using multiple initial conditions at the same energy level. A certain state of a trajectory must satisfy two conditions to appear on the Poincaré section:
+\begin{align}
+    \varphi_1 = 0 \qquad \text{and} \qquad \dot \varphi_1 + \mu \lambda \dot \varphi_2 \cos{\varphi_2} > 0 \label{eq:condition1}
+\end{align}
+
+The second condition comes from the fact that two values $\dot \varphi_1$ are possible when $\varphi_1=0$ and that $\varphi_2$, $\dot \varphi_2$ and $E$ are known. In fact, we can solve \eqref{eq:energy} for $\dot \varphi_1$:
+\begin{align*}
+    \dot \varphi_1 = -\mu \lambda \dot \varphi_2 \cos{\varphi_2} \pm \sqrt{\mu \lambda^2 \dot \varphi_2^2 \left(\mu \cos^{2}\varphi_2 - 1\right) + 2 \mu \lambda (\cos{\varphi_2} - 1) + 2E}
+\end{align*}
+
+If we prefer to use $\varphi_2=0$ as condition for the Poincaré section, we get the following conditions:
+\begin{align}
+    \varphi_2 &= 0 \qquad \text{and} \qquad \dot \varphi_2 + \frac{1}{\lambda} \dot \varphi_1 \cos{\varphi_1} > 0 \label{eq:condition2}\\
+    \text{since} \quad \dot \varphi_2 &= -\frac{1}{\lambda} \dot \varphi_1 \cos{\varphi_1} \pm \frac{1}{\lambda \sqrt{\mu}} \sqrt{\dot \varphi_1^2 \left(\mu \cos^{2}\varphi_1 - 1\right) + 2 (\cos{\varphi_1} - 1) + 2E}\nonumber
+\end{align}
+
+The following figures represent the evolution of the Poincaré map with the energy for a fixed value of $\mu$ and $\lambda$. The figures \ref{fig:section_1} and \ref{fig:section_2} compare the influence of $\lambda=\ell_2 / \ell_1$ for equal masses $\mu=0.5$. The figures \ref{fig:section_3} and \ref{fig:section_4} compare the influence of $\mu=m_2 / (m_1+m_2)$ for equal lengths $\lambda=1$. And finally, in figure \ref{fig:section_5}, I computed the sections of the basic version of the pendulum with equal masses $\mu=0.5$ and equal rod lengths $\lambda=1$.
+
+%For all the pairs $\lambda$, $\mu$, the energy levels are distributed in the intervals $[E_1, E_2]$, $[E_2, E_3]$, $[E_3, E_4]$ and $[E_4, +\infty)$, such that each interval contains at least one energy level represented in the figure. % whose Poincaré section is
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{Figures/sections_4.svg}
+    \caption{Poincaré sections for $\lambda=1/3$ and $\mu=0.5$, with condition $\varphi_1=0$.}
+    \label{fig:section_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{Figures/sections_3.svg}
+    \caption{Poincaré sections for $\lambda=3$ and $\mu=0.5$, with condition $\varphi_1=0$.}
+    \label{fig:section_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{Figures/sections_1.svg}
+    \caption{Poincaré sections for $\lambda=1$ and $\mu=0.1$, with condition $\varphi_2=0$.}
+    \label{fig:section_3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{Figures/sections_2.svg}
+    \caption{Poincaré sections for $\lambda=1$ and $\mu=0.9$, with condition $\varphi_1=0$.}
+    \label{fig:section_4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=\textwidth]{Figures/sections_0.svg}
+    \caption{Poincaré sections for $\lambda=1$ and $\mu=0.5$, with condition $\varphi_1=0$.}
+    \label{fig:section_5}
+\end{figure}
+
+This procedure is very efficient to find stable periodic orbits. It also gives a qualitative information about the degree of chaos for specific values of $\mu$, $\lambda$ and $E$. In every case, the Poincaré section globally evolves with the same pattern when $E$ increases:
+\begin{enumerate}
+    \item For low energies, the behavior is only periodic and quasiperiodic. Furthermore, since the oscillations are small, we can linearize the system around the stable equilibrium. We obtain the two normal modes that are the only periodic trajectories: the two pendulum oscillate in phase (the dot on the top) or in opposite phase (the dot on the bottom). The angular frequency of these normal modes are given by the eigenvalues of the Jacobian in equation \eqref{eq:eigenvalues}.
+    \item When the energy increases, the quasiperiodic orbits around the two initial periodic orbits become distorted and new periodic orbits appear. Then, chaotic regions  progressively replace non-chaotic regions. In general, the transition from regular to chaotic orbits has a fractal structure \cite{ChaosPC}.
+    \item For high energies $E \gg E_4$, the system becomes regular again. In that configuration, both pendulum move together, performing complete rotations in a manner comparable to a simple pendulum.
+\end{enumerate}
+
+This method has however a major drawback: it needs a lot of computations. In average, each plot contains $25\,000$ points and required $5$ million steps of numerical integration. Of course, this is an average over the $30$ Poincaré sections since the numerical integrator - \texttt{LSODA} from \texttt{SciPy} - uses an adaptive step size that depends on $E$, $\lambda$, $\mu$, the initial conditions and the desired accuracy.
+%In average, a trajectory needed $200$ steps of numerical integration before its state satisfied conditions \eqref{eq:condition1} or \eqref{eq:condition2}. Therefore, %depending on the stiffness of the differential equation. 
+
+The use of parallel computing helps to improve the speed of the computations but it remains quite slow. Changing the programming language from \texttt{Python} to \texttt{C} could also help to improve the performance.
+
+\nocite{*}
+\printbibheading
+\printbibliography[type=book,heading=subbibliography,title={Book Sources}]
+\printbibliography[nottype=book, nottype=online, heading=subbibliography,title={Article Sources}]
+\printbibliography[type=online,heading=subbibliography,title={Online Sources}]
+
+\end{document}

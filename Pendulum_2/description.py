@@ -57,7 +57,7 @@ def draw_one_frame(phi1, phi2, l1, l2):
 
     ax.set_aspect('equal', 'datalim')
     ax.axis('off')
-    # fig.savefig("./Figures/description.svg", format='svg', bbox_inches='tight')
+    # fig.savefig("./figures/description.svg", format='svg', bbox_inches='tight')
     plt.show()
 
 

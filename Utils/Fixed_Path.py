@@ -9,7 +9,7 @@ from numpy import array, amax, concatenate, amin
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'
 
-directoryName = "C:/Users/vince/PycharmProjects/Project_Perso/Simulations/Figures/"
+directoryName = "C:/Users/vince/PycharmProjects/Project_Perso/Simulations/figures/"
 #directoryName = "C:/Users/vince/Pictures/Iphone - Synchronisation/Simulations/"
 
 # inferno, jet, viridis, magma, Blues

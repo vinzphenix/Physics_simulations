@@ -107,11 +107,11 @@ if __name__ == "__main__":
         set_axes_equal(ax)
 
         # animate(0)
-        # fig.savefig("./Animations/fig_torus_periodic.png", format='png', bbox_inches='tight')
+        # fig.savefig("./animations/fig_torus_periodic.png", format='png', bbox_inches='tight')
 
         anim = animation.FuncAnimation(fig, animate, nFrames + 1, interval=1000 / fps, blit=True, init_func=init, repeat=False)
         # anim = animation.FuncAnimation(fig, animate, nFrames, interval=1000. / fps, repeat=False)  # remove blit for save
-        # anim.save('./Animations/{:s}.mp4'.format("poincare_torus"), writer="ffmpeg", dpi=150, fps=fps)
+        # anim.save('./animations/{:s}.mp4'.format("poincare_torus"), writer="ffmpeg", dpi=150, fps=fps)
 
     else:
         ax.view_init(elev_max, -60)
@@ -119,6 +119,6 @@ if __name__ == "__main__":
         setup_ax(ax, 0.5, 1.)
         ax.plot(crossings[:, 0], crossings[:, 1], crossings[:, 2], marker='o', linestyle='', color='C2', markersize=5, zorder=4)
         set_axes_equal(ax)
-        # fig.savefig("./Figures/poincare_quasi_new.svg", format='svg', bbox_inches='tight')
+        # fig.savefig("./figures/poincare_quasi_new.svg", format='svg', bbox_inches='tight')
 
     plt.show()

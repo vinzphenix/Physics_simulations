@@ -1,19 +1,19 @@
 # Vincent Degrooff - 2022 - EPL
-# Plot multiple Poincare sections with points stored in the "Data" directory
+# Plot multiple Poincare sections with points stored in the "data" directory
 
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 ftSz1, ftSz2, ftSz3 = 18, 16, 13
-plt.rcParams["text.usetex"] = True
+plt.rcParams["text.usetex"] = False
 plt.rcParams['font.family'] = 'serif'
 
 
 def load_file(s, number):
-    filename = f"./Data/coordinates_{s}{number:d}.txt"
+    filename = f"data/coordinates_{s}{number:d}.txt"
     if not os.path.exists(filename):
-        filename = f"./Data/coordinates_{s}{number-1:d}.txt"
+        filename = f"data/coordinates_{s}{number - 1:d}.txt"
         # raise FileNotFoundError
 
     with open(filename, "r") as txt_file:
@@ -24,7 +24,7 @@ def load_file(s, number):
     return np.loadtxt(filename, skiprows=1), E, mode, L, MU
 
 
-def plot_series(series, file_numbers, custom=False, save=False):
+def plot_series(series, file_numbers, custom=False, save=""):
     m = 1
     a = [1., 1., 1., 1., 1., 1.]
     k = [1, 1, 1, 1, 1, 1]
@@ -54,13 +54,14 @@ def plot_series(series, file_numbers, custom=False, save=False):
     for ax in axs[-1, :]:
         ax.set_xlabel(r"$\varphi_{:d}$".format(m), fontsize=ftSz2)
 
-    if save:
-        fig.savefig(f"./Figures/sections/sections_new.svg", format='svg', bbox_inches='tight', dpi=300)
-    plt.show()
+    if save != "":
+        fig.savefig(f"./figures/sections/{save}.svg", format='svg', bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
     return
 
 
-def plot_section(this_series, this_nb, save=False):
+def plot_section(this_series, this_nb, save=""):
     res, energy, m, l, mu = load_file(this_series, this_nb)
 
     fig, ax = plt.subplots(1, 1, figsize=(8, 7), constrained_layout=True)
@@ -76,21 +77,22 @@ def plot_section(this_series, this_nb, save=False):
     ax.set_xlabel(r"$\varphi_{:d}$".format(m), fontsize=ftSz2)
     ax.set_ylabel(r"$\dot \varphi_{:d}$".format(m), fontsize=ftSz2)
 
-    if save:
-        fig.savefig(f"./Figures/sections/alone_new.svg", format='svg', bbox_inches='tight', dpi=300)
-    plt.show()
+    if save != "":
+        fig.savefig(f"./figures/sections/{save}.svg", format='svg', bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
     return
 
 
 if __name__ == "__main__":
+    b = True
+    plt.rcParams["text.usetex"] = b
 
     # plot_series('a', [1, 4, 5, 6, 7, 9])  # L = 1.  MU = 0.1
     # plot_series('b', [1, 2, 3, 4, 5, 8])  # L = 1.  MU = 0.9
     # plot_series('c', [1, 3, 4, 6, 7, 9])  # L = 3.  MU = 0.5
     # plot_series('d', [1, 2, 3, 4, 5, 8])  # L = 1/3 MU = 0.5
-    # plot_series('e', [2, 3, 4, 5, 6, 8])  # L = 1 MU = 0.5
+    plot_series('e', [2, 3, 4, 5, 6, 8], save="")  # L = 1 MU = 0.5  # sections_basic
     # plot_series('', [1, 4, 5, 6, 7, 8])  # VARIOUS
 
-    b = False
-    plt.rcParams["text.usetex"] = b
-    plot_section('b', 4, save=b)
+    plot_section('b', 4, save="") # alone_fractal

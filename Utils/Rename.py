@@ -2,14 +2,14 @@ import os
 from dateutil import parser
 
 
-#path = "C:/Users/vince/Documents/Animations/Atwood_machine/Atwood_om_dr_4.415_6.010_frames"
-#path = "C:/Users/vince/Documents/Animations/Atwood_machine/Atwood_om_dr_4.419_6.014_frames"
+#path = "C:/Users/vince/Documents/animations/Atwood_machine/Atwood_om_dr_4.415_6.010_frames"
+#path = "C:/Users/vince/Documents/animations/Atwood_machine/Atwood_om_dr_4.419_6.014_frames"
 #path = "C:/Users/vince/Documents/Animations_Videos/Pendule_Elastique_Video/X_Y_50_100_frames/"
 
 fileName = "Pdl_Horizontal"
 
-#myPath = "C:/Users/vince/PycharmProjects/Project_Perso/Simulations/Figures/"
-myPath = "C:/Users/vince/OneDrive - UCL/Simulations/Figures/" + fileName
+#myPath = "C:/Users/vince/PycharmProjects/Project_Perso/Simulations/figures/"
+myPath = "C:/Users/vince/OneDrive - UCL/Simulations/figures/" + fileName
 
 #files = sorted(os.listdir(myPath), key=os.path.getmtime)
 files = sorted(os.listdir(myPath), key=lambda x: os.path.getmtime(os.path.join(myPath, x)))

@@ -90,5 +90,5 @@ if __name__ == "__main__":
     template = r"Equilibria of the system for $\alpha={:.2f}$ and $\mu \in [{:.2f}, {:.2f}]$"
     # fig.suptitle(template.format(l_fixed, param_mu[0], param_mu[-1]), fontsize=ftSz1)
 
-    # fig.savefig("./Figures/eigenvalues_latex_{:.2f}.svg".format(l_fixed), format='svg', bbox_inches='tight')
+    # fig.savefig("./figures/eigenvalues_latex_{:.2f}.svg".format(l_fixed), format='svg', bbox_inches='tight')
     plt.show()

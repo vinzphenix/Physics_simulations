@@ -2,12 +2,13 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from timeit import default_timer as timer
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 from numpy import sin, cos, radians, pi
 from scipy.integrate import odeint
 
-plt.rcParams['mathtext.fontset'] = 'cm'
-plt.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.usetex'] = False
+ftSz1, ftSz2, ftSz3 = 20, 17, 12
 
 
 def dynamics(u, _):
@@ -44,7 +45,7 @@ def init():
     return tuple(lines) + (time_text, sector)
 
 
-def animate(i):
+def update(i):
     i *= ratio
     for j, line in enumerate(lines):
         line.set_data([0, xa[i, j], xb[i, j]], [0, ya[i, j], yb[i, j]])
@@ -60,7 +61,7 @@ def animate(i):
 if __name__ == "__main__":
 
     #####     ================      Paramètres  de la simulation      ================      ####
-    save = False
+    save = ""
     n_p = 20  # [/]     -  nombre pendules
 
     g = 9.81  # [m/s²]  -  accélaration de pesanteur
@@ -97,8 +98,8 @@ if __name__ == "__main__":
     long2 = np.linspace(l2_avg, l2_avg * 1.0, n_p)
 
     U0 = np.zeros(4 * n_p)
-    U0[0:2 * n_p:2] = np.linspace(th, th + pi / 180, n_p)
-    U0[1:2 * n_p:2] = np.linspace(phi, phi + pi / 180, n_p)
+    U0[0:2 * n_p:2] = np.linspace(th, th + pi / 180, n_p)  # within 1 degree
+    U0[1:2 * n_p:2] = np.linspace(phi, phi + pi / 180, n_p)  # within 1 degree
     U0[2 * n_p::2] = np.linspace(Om, Om * 1.00, n_p)
     U0[2 * n_p + 1::2] = np.linspace(om, om * 1.00, n_p)
 
@@ -113,6 +114,9 @@ if __name__ == "__main__":
     yb = ya + np.multiply(-cos(sol[:, 1::2]), long2)
 
     #####     ================      Création de la figure      ================      #####
+    ratio = 1 if save == "snapshot" else ratio
+    plt.rcParams['text.usetex'] = (save == "snapshot") or (save == "gif")
+
     fig, ax1 = plt.subplots(1, 1, figsize=(7, 6.5), constrained_layout=True)
     lim = 1.15 * L
     ax1.set_aspect("equal")
@@ -129,11 +133,16 @@ if __name__ == "__main__":
 
     #####     ================      Animation      ================      #####
     # animate(0)
-    # fig.savefig(f"./Animations/fig_quasi.png", format='png', bbox_inches='tight', dpi=300)
-    anim = FuncAnimation(fig, animate, n // ratio, init_func=init, interval=5, blit=True, repeat_delay=3000)
+    # fig.savefig(f"./animations/fig_quasi.png", format='png', bbox_inches='tight', dpi=300)
+    anim = FuncAnimation(fig, update, n // ratio, init_func=init, interval=5, blit=True, repeat_delay=3000)
 
-    if save:
+    if save == "mp4":
         # anim.save('Pendule_multiple_double_5.html', fps=30)
-        anim.save('./Animations/{:s}.mp4'.format("multiple_pendulum_new"), writer="ffmpeg", dpi=150, fps=fps)
+        anim.save('./animations/{:s}.mp4'.format("multiple_pendulum_new"), writer="ffmpeg", dpi=150, fps=fps)
+    elif save == "gif":
+        anim.save('./animations/{:s}.gif'.format("multiple_pendulum"), writer=PillowWriter(fps=20))
+    elif save == "snapshot":
+        update(int(5. * n / Tend))
+        fig.savefig("./figures/{:s}.svg".format("multiple_pendulum"), format="svg", bbox_inches="tight")
     else:
         plt.show()

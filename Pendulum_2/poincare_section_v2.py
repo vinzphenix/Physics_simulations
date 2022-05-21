@@ -401,14 +401,14 @@ def get_bounds():
 
 def save_file(points, merge=False):
     if merge and reuse > 0:
-        filename = f"./Data/coordinates_{series}{reuse}.txt"
+        filename = f"data/coordinates_{series}{reuse}.txt"
         with open(filename, "a") as txt_file:
             np.savetxt(txt_file, points, fmt='%.5e')
     else:
         i = 1
-        while os.path.exists(f"./Data/coordinates_{i}.txt"):
+        while os.path.exists(f"data/coordinates_{i}.txt"):
             i += 1
-        filename = f"./Data/coordinates_{i}.txt"
+        filename = f"data/coordinates_{i}.txt"
         head = "{:e} {:e} {:e} {:d}".format(E, L, MU, mode)
         np.savetxt(filename, points, header=head, fmt='%.5e')
     return
@@ -416,7 +416,7 @@ def save_file(points, merge=False):
 
 def load_file():
     global E, L, MU, mode
-    filename = f"./Data/coordinates_{series:s}{reuse:d}.txt"
+    filename = f"data/coordinates_{series:s}{reuse:d}.txt"
     # print(filename)
     if not os.path.exists(filename):
         raise FileNotFoundError
@@ -447,7 +447,7 @@ if __name__ == "__main__":
     cmap = plt.get_cmap('jet_r')
 
     # 1, 4, 6, 8, b4
-    reuse, series = 4, 'b'  # append computations to ./Data/coordinates_{reuse}.txt
+    reuse, series = 4, 'b'  # append computations to ./data/coordinates_{reuse}.txt
     interactive = True  # compute trajectories by clicking on the section
     do_save = False  # save the results to a file
     use_colors = True  # represent the other angular velocity with colors
@@ -479,7 +479,7 @@ if __name__ == "__main__":
             else:
                 ax.scatter(res[:, 0], res[:, 1], norm=normalize, s=1, c=res[:, 2], cmap=cmap)
 
-            # fig.savefig(f"./Sections/run_{series}{reuse}.svg", format='svg', bbox_inches='tight')
+            # fig.savefig(f"./sections/run_{series}{reuse}.svg", format='svg', bbox_inches='tight')
 
         # if input("Sample new points with multiprocess ? [y/n]") == 'y':
             # # res = plot_random(n_samples=N, U0_list=[])

@@ -192,8 +192,8 @@ if __name__ == "__main__":
 
         anim = animation.FuncAnimation(fig, animate, nFrames, interval=1000 / fps, blit=True, init_func=init, repeat=False)
         # anim = animation.FuncAnimation(fig, animate, nFrames, interval=1000. / fps, repeat=False)  # remove blit for save
-        # anim.save('./Animations/{:s}.mp4'.format("potential_1"), writer="ffmpeg", dpi=150, fps=fps)
-        # anim.save('./Animations/{:s}.html'.format("potential_1"), writer="html", fps=fps)
+        # anim.save('./animations/{:s}.mp4'.format("potential_1"), writer="ffmpeg", dpi=150, fps=fps)
+        # anim.save('./animations/{:s}.html'.format("potential_1"), writer="html", fps=fps)
 
     else:
         ax.view_init(48, 120)
@@ -210,6 +210,6 @@ if __name__ == "__main__":
                 plot_this_level(ax, i, this_lw=1., this_a=0.5)
 
         fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
-        # fig.savefig("./Figures/potential_torus_3D.svg", format='svg', bbox_inches="tight")
+        # fig.savefig("./figures/potential_torus_3D.svg", format='svg', bbox_inches="tight")
 
     plt.show()

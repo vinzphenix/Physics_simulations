@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
         anim = animation.FuncAnimation(fig, animate, nFrames, interval=1000 / fps, blit=True, init_func=init, repeat=False)
         # anim = animation.FuncAnimation(fig, animate, nFrames, interval=1000. / fps)
-        # anim.save('./Animations/{:s}.mp4'.format("potential_param_2"), writer="ffmpeg", dpi=200, fps=fps)
+        # anim.save('./animations/{:s}.mp4'.format("potential_param_2"), writer="ffmpeg", dpi=200, fps=fps)
 
     else:
         fig, axs = plt.subplots(2, 2, figsize=(11, 9), constrained_layout=True)
@@ -114,6 +114,6 @@ if __name__ == "__main__":
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=pot_max))
         cbar = fig.colorbar(sm, ax=axs.ravel().tolist(), aspect=40)
         cbar.ax.set_ylabel("Energy [/]", fontsize=ftSz2)
-        fig.savefig("./Figures/potential_torus_2D.svg", format='svg', bbox_inches='tight')
+        fig.savefig("./figures/potential_torus_2D.svg", format='svg', bbox_inches='tight')
 
     plt.show()

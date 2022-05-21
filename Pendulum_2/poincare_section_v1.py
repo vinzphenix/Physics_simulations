@@ -197,7 +197,7 @@ if __name__ == "__main__":
         if E < 4 * l * m:
             phi_max = arccos(1 - E / (2 * l * m))
 
-    #filename = "./Data/" + "coordinates_" + "{:.3f}_".format(E) + "{:.3f}_".format(l) + "{:.3f}".format(m) + ".txt"
+    #filename = "./data/" + "coordinates_" + "{:.3f}_".format(E) + "{:.3f}_".format(l) + "{:.3f}".format(m) + ".txt"
     #file = open(filename, "a")
     #file.write("{} {} {}\n".format(E, l, m))
 
