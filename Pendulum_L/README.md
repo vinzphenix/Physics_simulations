@@ -1,8 +1,7 @@
 # L-shaped pendulum 
 
 ## Equations of motion
-
-Too complicated `-> code`
+![equations](./ode_pendulum_L.png)
 
 ## Example
 ![example](./pendulum_L.gif)

@@ -12,7 +12,10 @@
 
 \begin{document}
 
-$1+1=2$
+\begin{align*}
+\ell = L-h \qquad d = \frac{L}{2} \, \frac{L-h}{2L-h} \qquad d_1 = \frac{L_1 - h_1}{2} \qquad d_2 = \frac{L_2 - h_2}{2}\\
+
+\end{align*}
 
 \end{document}
 
@@ -224,7 +227,30 @@ $1+1=2$
 \end{align*}
 }
 
-\begin{align*}
+\begin{align*}  % Duffing oscillator
     \ddot{x} + \gamma \dot{x} + \alpha x + \beta x^3 &= A \cos (\omega t)\\[5pt]
     \text{sample at } \quad x &= \phi \mod 2\pi
+\end{align*}
+
+\begin{align*} % Pendulum L - part 1
+    \ell = L-h \qquad d = \frac{L}{2} \, \frac{L-h}{2L-h} \qquad d_i = \frac{L_i - h_i}{2} \qquad \alpha_i &= \frac{\pi}{4} + \varphi_i - \vartheta\\[15pt]
+    I = \frac{m}{6(2L-h)^2} (5L^2-5Lh+h^2) (L^2-Lh+h^2) \qquad I_i = \frac{m_i}{12} (L_i^2+h_i^2)  \quad i&=1,2 \\[30pt]
+    \begin{bmatrix}
+        Md^2+\ell^2(m_1+m_2) + I\; & \ell m_1 d_1 \cos \alpha_1 \; & -\ell m_2 d_2 \sin \alpha_2\\[8pt]
+        \ell m_1 d_1 \cos \alpha_1 & m_1 d_1^2 + I_1 & 0 \\[8pt]
+        -\ell m_2 d_2 \sin \alpha_2 & 0 & m_2 d_2^2 + I_2\\[8pt]
+    \end{bmatrix}
+    \begin{bmatrix}
+        \ddot{\vartheta}\\[8pt]
+        \ddot{\varphi_1}\\[8pt]
+        \ddot{\varphi_2}\\[8pt]
+    \end{bmatrix}&
+\end{align*}
+\begin{align*}  % Pendulum L - part 2
+    \qquad\qquad\qquad =
+    \begin{bmatrix}
+        \ell m_1 d_1 \dot{\varphi_1}^2 \sin\alpha_1 + \ell m_2 d_2 \dot{\varphi_2}^2 \cos\alpha_2 - gMd\sin \vartheta - g m_1 \ell \sin(\vartheta - \frac{\pi}{4}) - g m_2 \ell \cos(\vartheta - \frac{\pi}{4})\\[8pt]
+        -\ell m_1 d_1 \dot{\vartheta}^2 \sin \alpha_1 - g m_1 d_1 \sin \varphi_1\\[8pt]
+        -\ell m_2 d_2 \dot{\vartheta}^2 \cos \alpha_2 - g m_2 d_2 \sin \varphi_2\\[8pt]
+    \end{bmatrix}
 \end{align*}
