@@ -47,7 +47,16 @@ def animate(args):
         dot_t.set_data(t[i], tau[i])
         time_text.set_text(time_template.format(t[i]))
 
-        return arrow_T, arrow_N, arrow_B, dot_p, dot_k, dot_t, time_text
+        # cx = center[0, i] + 1./k[i] * cos(theta) * T[0, i] + 1./k[i] * sin(theta) * N[0, i]
+        # cy = center[1, i] + 1./k[i] * cos(theta) * T[1, i] + 1./k[i] * sin(theta) * N[1, i]
+        # cz = center[2, i] + 1./k[i] * cos(theta) * T[2, i] + 1./k[i] * sin(theta) * N[2, i]
+        # circle.set_data(cx, cy)
+        # circle.set_3d_properties(cz)
+
+        circle[0].remove()
+        circle[0] = ax.plot_surface(cx[i], cy[i], cz[i], color='C1', linewidth=0., alpha=tsp, shade=shade, zorder=0)
+
+        return arrow_T, arrow_N, arrow_B, dot_p, dot_k, dot_t, time_text, circle
 
     T, N, B, k, tau = args
     r_T, r_N, r_B = r + scale_arrow * T, r + scale_arrow * N, r + scale_arrow * B
@@ -72,11 +81,11 @@ def animate(args):
     dot_t, = ax2.plot([], [], "o", color='C2', ms=6)
 
     arrow_B, = ax.plot([r[0][0], r_B[0][0]], [r[1][0], r_B[1][0]], [r[2][0], r_B[2][0]],
-                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C2', zorder=1)
+                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C2', zorder=5)
     arrow_N, = ax.plot([r[0][0], r_N[0][0]], [r[1][0], r_N[1][0]], [r[2][0], r_N[2][0]],
-                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C1', zorder=3)
+                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C1', zorder=7)
     arrow_T, = ax.plot([r[0][0], r_T[0][0]], [r[1][0], r_T[1][0]], [r[2][0], r_T[2][0]],
-                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C0', zorder=2)
+                       marker="o", markevery=[-1], ms=ms, lw=lw, color='C0', zorder=6)
 
     time_template = r"$t = {:.2f}$"
     time_text = ax.text2D(0.85, 0.85, "", transform=ax.transAxes, fontsize=ftSz2)
@@ -91,6 +100,25 @@ def animate(args):
     Zb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2, -1:2:2][2].flatten() + 0.5 * (np.amax(r[2]) + np.amin(r[2]))
     for xb, yb, zb in zip(Xb, Yb, Zb):
         ax.plot([xb], [yb], [zb], 'w', alpha=0.)
+
+    ax.set_autoscale_on(False)
+
+    # n_theta = 100
+    # theta = np.linspace(0., 2. * pi, n_theta)
+    # center = r + (1. / k) * N
+    # circle, = ax.plot([], [], [], color="C1", lw=2, alpha=0.5)
+
+    n_xi, n_theta = 2, 50
+    xi, theta = np.linspace(0., 1., n_xi), np.linspace(0., 2. * pi, n_theta)
+    xi, theta = np.meshgrid(xi, theta)
+    xi, theta = xi[np.newaxis, :, :], theta[np.newaxis, :, :]  # axes: time, xi, eta
+    center = (r + (1. / k) * N)[:, :, np.newaxis, np.newaxis]  # axes: direction, time, xi, eta
+    kc, Tc, Nc = k[:, np.newaxis, np.newaxis], T[:, :, np.newaxis, np.newaxis], N[:, :, np.newaxis, np.newaxis]
+
+    cx = center[0] + xi/kc * cos(theta) * Tc[0] + xi/kc * sin(theta) * Nc[0]
+    cy = center[1] + xi/kc * cos(theta) * Tc[1] + xi/kc * sin(theta) * Nc[1]
+    cz = center[2] + xi/kc * cos(theta) * Tc[2] + xi/kc * sin(theta) * Nc[2]
+    circle = [ax.plot_surface(cx[0], cy[0], cz[0], color='C1', linewidth=0., alpha=tsp, shade=shade, zorder=0)]
 
     nFrames = n // skip + 1
     # noinspection PyTypeChecker
@@ -152,9 +180,10 @@ def xyz():
 
 
 if __name__ == "__main__":
-    save, name = "none", "homemade"
-    lw, ms, scale_arrow = 3., 8., 2./3.  # line options
-    elev_min, elev_max, azim_init, delta_azim = 10., 10., 120, 60  # view options
+    # ffmpeg -ss 0.0 -t 9.5 -i input.mp4 -f gif output.gif
+    save, name = "none", "viviani"
+    lw, ms, scale_arrow, tsp, shade = 3., 8., 2./3., 0.4, False  # line options
+    elev_min, elev_max, azim_init, delta_azim = 10., 10., 100, -60  # view options
 
     n, skip = 2000, 4
     h = 2 * np.pi / n
