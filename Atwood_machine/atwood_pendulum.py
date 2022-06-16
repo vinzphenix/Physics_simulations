@@ -27,7 +27,7 @@ class Simulation:
         self.oversample = dic_setup["oversample"]  # display one frame every ... frames
         self.t_anim = self.slowdown * self.t_sim
         self.nFrames = int(self.fps * self.t_anim)
-        self.nSteps = self.oversample * self.nFrames + 1
+        self.nSteps = self.oversample * self.nFrames
 
 
 def solve_equations_of_motion(sim):
@@ -38,7 +38,7 @@ def solve_equations_of_motion(sim):
         return array([dr_, f1, om_, f2])
 
     m, g, M = sim.m, sim.g, sim.M
-    t = np.linspace(0, sim.t_sim, sim.nSteps)
+    t = np.linspace(0, sim.t_sim, sim.nSteps + 1)
     U0 = array([sim.r, sim.dr, radians(sim.th), sim.om])
 
     tic = perf_counter()

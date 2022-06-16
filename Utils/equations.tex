@@ -254,3 +254,31 @@
         -\ell m_2 d_2 \dot{\vartheta}^2 \cos \alpha_2 - g m_2 d_2 \sin \varphi_2\\[8pt]
     \end{bmatrix}
 \end{align*}
+
+\begin{align*}  % Frenet-Serret formulas 3D
+    \mathbf{r}(t) &=
+    \begin{bmatrix}
+        x(t) & y(t) & z(t)
+    \end{bmatrix}\\[15pt]
+    \mathbf{\hat T} = \dv{\mathbf{r}}{t} \Big/ \left|\dv{\mathbf{r}}{t}\right| \qquad
+    \mathbf{\hat N} &= \dv{\mathbf{\hat T}}{t} \Big/ \left|\dv{\mathbf{\hat T}}{t}\right| \qquad
+    \mathbf{\hat B} = \mathbf{\hat T} \times \mathbf{\hat N}\\[10pt]
+    \dv{}{s}
+    \begin{bmatrix}
+        \mathbf{\hat T}\\
+        \mathbf{\hat N}\\
+        \mathbf{\hat B}\\
+    \end{bmatrix} &=
+    \begin{bmatrix}
+        0 & \kappa & 0\\
+        -\kappa & 0 & \tau\\
+        0 & \tau & 0\\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \mathbf{\hat T}\\
+        \mathbf{\hat N}\\
+        \mathbf{\hat B}\\
+    \end{bmatrix} \\[10pt]
+    \kappa = \frac{|\mathbf{\dot r} \times \mathbf{\ddot r}|}{|\mathbf{\dot r}|^3} &\qquad\qquad
+    \tau = \frac{(\mathbf{\dot r} \times \mathbf{\ddot r}) \cdot \mathbf{\dddot r}}{|\mathbf{\dot r} \times \mathbf{\ddot r}|^2}
+\end{align*}

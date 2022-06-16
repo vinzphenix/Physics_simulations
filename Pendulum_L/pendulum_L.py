@@ -40,7 +40,7 @@ class Simulation:
         self.oversample = dic_setup["oversample"]  # display one frame every ... frames
         self.t_anim = self.slowdown * self.t_sim
         self.nFrames = int(self.fps * self.t_anim)
-        self.nSteps = self.oversample * self.nFrames + 1
+        self.nSteps = self.oversample * self.nFrames
 
         return
 
@@ -99,7 +99,7 @@ def solve_equations_of_motion(sim):
     RHS_11, RHS_12, RHS_13 = -g * M * d, -g * m1 * l, -g * m2 * l
     RHS_21, RHS_31 = -g * m1 * d1, -g * m2 * d2
 
-    t = np.linspace(0., sim.t_sim, sim.nSteps)
+    t = np.linspace(0., sim.t_sim, sim.nSteps + 1)
     # phi10 = 1/9*pi ; phi20 = 1/9*pi
     U0 = radians(np.array([sim.th, sim.phi1, sim.phi2, sim.om, sim.om1, sim.om2]))
 
@@ -111,8 +111,8 @@ def solve_equations_of_motion(sim):
     # th, phi1, phi2, om, om1, om2 = sol.y
     th, phi1, phi2, om, om1, om2 = sol.T
     # phi2 = np.fmod(np.fmod(phi2, 2 * pi) + 2 * pi + pi, 2 * pi) - pi
-    MATRIX = np.empty((3, 3, sim.nSteps))
-    VECTOR = np.empty((3, sim.nSteps))
+    MATRIX = np.empty((3, 3, sim.nSteps + 1))
+    VECTOR = np.empty((3, sim.nSteps + 1))
     _, _, _, d2th, d2phi1, d2phi2 = f(-1., (th, phi1, phi2, om, om1, om2), MATRIX, VECTOR)
 
     return t, th, phi1, phi2, om, om1, om2, d2th, d2phi1, d2phi2
