@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the root directory of your project to sys.path
+current_directory = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(project_root)
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -14,7 +22,7 @@ ftSz1, ftSz2, ftSz3 = 20, 17, 14
 lw = 1.
 
 
-class Simulation:
+class Atwood_Simulation:
     def __init__(self, dic_params, dic_initial, dic_setup):
         self.g, self.M, self.m = dic_params["g"], dic_params["M"], dic_params["m"]
         self.mu = self.M / self.m
@@ -30,7 +38,7 @@ class Simulation:
         self.nSteps = self.oversample * self.nFrames
 
 
-def solve_equations_of_motion(sim):
+def atwood_ode(sim):
     def f(u, _):
         r_, dr_, th_, om_ = u
         f1 = (m * r_ * om_ * om_ + g * (-M + m * cos(th_))) / (M + m)
@@ -49,7 +57,7 @@ def solve_equations_of_motion(sim):
     return t, r, dr, th, om
 
 
-def get_kinematics(sim, time_series):
+def atwood_kinematics(sim, time_series):
     g, M, m = sim.g, sim.M, sim.m
     t, r, dr, th, om = time_series
 
@@ -73,14 +81,14 @@ def get_kinematics(sim, time_series):
 
 def see_animation(sim, time_series, save=""):
     t_full, r_full, dr_full, th_full, om_full = time_series
-    _, _, x2_full, y2_full, _, _, _, _, _, _, _, _ = get_kinematics(sim, time_series)
+    _, _, x2_full, y2_full, _, _, _, _, _, _, _, _ = atwood_kinematics(sim, time_series)
 
     k, time_series = sim.oversample, list(time_series)
     for idx, series in enumerate(time_series):
         time_series[idx] = series[::k]
 
     t, r, dr, th, om = time_series
-    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = get_kinematics(sim, time_series)
+    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(sim, time_series)
     L_X, L_Y = amax(x2) - amin(x2), amax(y2) - amin(y2)
     x_m, y_m = amin(x2) - 0.2 * L_X, amin(y2) - 0.2 * L_Y
     x_M, y_M = amax(x2) + 0.2 * L_X, amax(y2) + 0.2 * L_Y
@@ -171,10 +179,10 @@ def see_animation(sim, time_series, save=""):
         plt.show()
 
 
-def display_path(sim, time_series):
+def display_path_atwood(sim, time_series):
     g, M, m = sim.g, sim.M, sim.m
     t, r, dr, th, om = time_series
-    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = get_kinematics(sim, time_series)
+    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(sim, time_series)
 
     params2 = array([sim.r, sim.dr, sim.th, sim.om])
     dcm1, dcm2 = 5, 3
@@ -224,6 +232,15 @@ def display_path(sim, time_series):
     #see_path_1(1, array([om, dr]), r, 'inferno', name='om - dr', shift=(0., 0.), var_case=4, save='save')
 
 
+def sim_and_draw(initial, params, tsim):
+    setup = {"t_sim": tsim, "fps": 30., "slowdown": 1., "oversample": 15}
+    simulation = Atwood_Simulation(params, initial, setup)
+    time_series = atwood_ode(simulation)
+    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(simulation, time_series)
+    see_path(1., [array([x2, y2]), array([2*x2, 2*y2])], [v, v], ["Blues", "viridis"], var_case=2, save="no")
+
+    return
+
 if __name__ == "__main__":
 
     # initial, params = {"r": 1., "th": 150., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": 4.8}
@@ -237,15 +254,16 @@ if __name__ == "__main__":
          6.806, 7.244, 7.49, 7.7, 8.182370012, 8.182370165, 16, 19, 21, 24])
     # M = 5.569 # 6.1187 # 6.114 # 4.126 # 4.233 # 1.565 # 2.9452 # 2.021  # good or not ?
     initial, params = {"r": 1., "th": 90., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": M_list[26]}
+    # initial, params = {"r": 1., "th": 90., "dr": 0., "om": 0.}, {"g": 1.0, "m": 1., "M": M_list[26]}
 
     mode = "animation"
     # mode = "path"
-    setup = {"t_sim": 100., "fps": 30., "slowdown": 1., "oversample": 15}
+    setup = {"t_sim": 1.*np.sqrt(1.0), "fps": 30., "slowdown": 1., "oversample": 15}
 
-    simulation = Simulation(params, initial, setup)
-    solutions = solve_equations_of_motion(simulation)
+    simulation = Atwood_Simulation(params, initial, setup)
+    solutions = atwood_ode(simulation)
 
     if mode == "animation":
         see_animation(simulation, solutions, save="")
     elif mode == "path":
-        display_path(simulation, solutions)
+        display_path_atwood(simulation, solutions)

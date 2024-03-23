@@ -1,4 +1,10 @@
+import sys
 import os
+
+# Add the root directory of your project to sys.path
+current_directory = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_directory, '..'))
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,9 +15,7 @@ from numpy import array, amax, concatenate, amin
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'
 
-directoryName = "C:/Users/vince/PycharmProjects/Project_Perso/Simulations/figures/"
-#directoryName = "C:/Users/vince/Pictures/Iphone - Synchronisation/Simulations/"
-
+directoryName = project_root + "/figures/"
 # inferno, jet, viridis, magma, Blues
 
 

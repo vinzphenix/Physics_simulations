@@ -7,7 +7,6 @@ from matplotlib.animation import FuncAnimation
 from numpy import sin, cos, radians, pi, amax, abs
 from scipy.integrate import odeint
 from timeit import default_timer as timer
-# from Utils.Fixed_Path import see_path_1, see_path
 
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'

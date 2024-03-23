@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the root directory of your project to sys.path
+current_directory = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(project_root)
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -24,18 +32,18 @@ F  = 260.0               # [N]     -  intensité force
 w  = 80.00               # [rad]   -  pulsation force
 
 x_0   = 0.00             # [m]     -  position du bloc
-dx_0  = 0.00             # [m/s]   -  vitesse du bloc
-phi_0 = pi/4             # [rad]   -  angle 1er pendule
+dx_0  = 0.50             # [m/s]   -  vitesse du bloc
+phi_0 = pi/8             # [rad]   -  angle 1er pendule
 om_0  = 0.00             # [rad/s] -  v angulaire 1er pendule
 
 Tend = 20  # [s]    -  fin de la simulation
 n = int(500. * Tend)
 fps = 30
-ratio = n // (int(Tend * fps))
+ratio = 1#n // (int(Tend * fps))
 
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.5, 1e-3, 10.0, 1e4, 10 * g / l, 0, 0, 0.99 * pi / 4 * pi / 2, 0
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.5, 1e-3, 10.0, 1e4, 10 * g / l, 0, 0, 0.1, 0
-l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.4, 0.001, 5, 100, 3 * sqrt(g / l), 0, 0, pi, pi  # gif
+#l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.4, 0.001, 5, 100, 3 * sqrt(g / l), 0, 0, pi, pi  # gif
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.4, 0.001, 6, 15 * sqrt(g / l), 3 * sqrt(g / l), 0, 0, pi, pi
 # l, mp, mb, F, w, x_0, dx_0, phi_0, om_0 = 0.4, 0.001, 6, 100, 3 * sqrt(g / 0.4), 0, 0, pi, pi
 

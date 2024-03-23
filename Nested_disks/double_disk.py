@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the root directory of your project to sys.path
+current_directory = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(project_root)
+
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
