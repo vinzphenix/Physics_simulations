@@ -36,8 +36,8 @@ def animate(idx):
     azim = ax.azim + delta_azim / nFrames
     ax.view_init(elev, azim)
 
-    marker.set_data(x[i], y[i])
-    marker.set_3d_properties(z[i])
+    marker.set_data([x[i]], [y[i]])
+    marker.set_3d_properties([z[i]])
     line.set_data(x[st:i+1], y[st:i+1])
     line.set_3d_properties(z[st:i+1])
 

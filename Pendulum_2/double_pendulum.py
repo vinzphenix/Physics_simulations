@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # phi1_0, om1_0, phi2_0, om2_0 = radians([phi1_0, om1_0, phi2_0, om2_0])
     # phi1_0, om1_0, phi2_0, om2_0 = np.radians(phi1_0), om1_0*sqrt(g/l1), np.radians(phi2_0), om2_0*sqrt(g/l1)
 
-    # phi1_0, phi2_0, om1_0, om2_0, l1, l2, m1, m2 = *initial_conditions[4]
+    phi1_0, phi2_0, om1_0, om2_0, l1, l2, m1, m2 = initial_conditions[12]
 
     Tend = 30.
     n, fps = int(1000 * Tend), 30

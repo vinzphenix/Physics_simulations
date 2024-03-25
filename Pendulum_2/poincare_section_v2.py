@@ -263,7 +263,7 @@ def interactive_func():
     initConditions = []
     lines = []
 
-    # fig.canvas.mpl_connect('button_press_event', lambda event: on_click(event, initConditions, lines))
+    fig.canvas.mpl_connect('button_press_event', lambda event: on_click(event, initConditions, lines))
     fig.canvas.mpl_connect('key_press_event', lambda event: on_touch(event, initConditions, lines))
     print("\nHelp menu :\n\
     -> n : start a new computation using the mouse position and draws the points on the Poincare section\n\
@@ -432,7 +432,7 @@ def load_file():
 mode = 2  # Poincare section in the (phi_mode, om_mode) plane
 L = 1.0   # L = l2 / l1
 MU = 0.5  # MU = m2 / (m1 + m2)
-E = 2.    # energy level
+E = 1.    # energy level
 
 N = 4            # number of orbits to compute
 n_points = 1000  # number of points on the section for each orbit
@@ -447,7 +447,7 @@ if __name__ == "__main__":
     cmap = plt.get_cmap('jet_r')
 
     # 1, 4, 6, 8, b4
-    reuse, series = 4, 'b'  # append computations to ./data/coordinates_{reuse}.txt
+    reuse, series = -1, 'b'  # append computations to ./data/coordinates_{reuse}.txt
     interactive = True  # compute trajectories by clicking on the section
     do_save = False  # save the results to a file
     use_colors = True  # represent the other angular velocity with colors
