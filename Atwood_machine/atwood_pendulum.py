@@ -29,6 +29,7 @@ class Atwood_Simulation:
 
         self.r, self.dr, = dic_initial["r"], dic_initial["dr"]
         self.th, self.om = dic_initial["th"], dic_initial["om"]
+        self.thd = np.degrees(self.th)
 
         self.t_sim, self.fps = dic_setup["t_sim"], dic_setup["fps"]
         self.slowdown = dic_setup["slowdown"]  # . < 1 : faster; . = 1 : real time; 1 < . : slow motion
@@ -47,7 +48,7 @@ def atwood_ode(sim):
 
     m, g, M = sim.m, sim.g, sim.M
     t = np.linspace(0, sim.t_sim, sim.nSteps + 1)
-    U0 = array([sim.r, sim.dr, radians(sim.th), sim.om])
+    U0 = array([sim.r, sim.dr, sim.th, sim.om])
 
     tic = perf_counter()
     sol = odeint(f, U0, t)
@@ -103,8 +104,9 @@ def see_animation(sim, time_series, save=""):
     fig, axs = plt.subplots(1, 2, figsize=(14., 7.))  # , constrained_layout=True)
     ax, ax2 = axs[0], axs[1]
 
-    ax.axis([x_m, x_M, y_m, y_M])
-    ax.set_aspect("equal")
+    tmp, = ax.plot([x_m, x_M], [y_m, y_M])
+    ax.set_aspect("equal", "datalim")
+    tmp.remove()
     ax.grid(ls=':')
     ax2.grid(ls=':')
     ax2.set_xlabel(r'$\vartheta \;\; \rm [rad]$', fontsize=ftSz2)
@@ -124,7 +126,7 @@ def see_animation(sim, time_series, save=""):
     ftSz4 = ftSz3 * 0.9
     ax.text(0.66, 0.96, r'$r  = {:.2f} $'.format(sim.r), fontsize=ftSz4, transform=ax.transAxes)
     ax.text(0.66, 0.92, r'$\dot{{r}}  = {:.2f} $'.format(sim.dr), fontsize=ftSz4, transform=ax.transAxes)
-    ax.text(0.80, 0.96, r'$\vartheta  = {:.2f} \:\rm deg$'.format(sim.th), fontsize=ftSz4, transform=ax.transAxes)
+    ax.text(0.80, 0.96, r'$\vartheta  = {:.2f} \:\rm deg$'.format(sim.thd), fontsize=ftSz4, transform=ax.transAxes)
     ax.text(0.80, 0.92, r'$\omega  = {:.2f} \:\rm rad/s$'.format(sim.om), fontsize=ftSz4, transform=ax.transAxes)
 
     ax2.plot(th_full, om_full, color='C0')
@@ -184,7 +186,7 @@ def display_path_atwood(sim, time_series):
     t, r, dr, th, om = time_series
     x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(sim, time_series)
 
-    params2 = array([sim.r, sim.dr, sim.th, sim.om])
+    params2 = array([sim.r, sim.dr, sim.thd, sim.om])
     dcm1, dcm2 = 5, 3
     fmt2 = 1 + 1 + dcm2
     for val in params2:
@@ -199,7 +201,7 @@ def display_path_atwood(sim, time_series):
         "", r"$g$ = {:.2f} $\rm m/s^2$".format(g), "",
         r"$r \;\,\,$ = {:>{width}.{dcm}f} $\rm m$".format(sim.r, width=fmt2, dcm=dcm2),
         r"$dr$ = {:>{width}.{dcm}f} $\rm m/s$".format(sim.dr, width=fmt2, dcm=dcm2),
-        r"$\vartheta \;\,$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.th, width=fmt2, dcm=dcm2),
+        r"$\vartheta \;\,$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.thd, width=fmt2, dcm=dcm2),
         r"$\omega \;\,$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om, width=fmt2, dcm=dcm2)
     ]
 
@@ -207,13 +209,13 @@ def display_path_atwood(sim, time_series):
     parameters[1] = r"Axe y : $r$"
     parameters[2] = r"Axe c : $v^2$"
 
-    see_path_1(lw, array([x2, y2]), v, color='jet', var_case=1, shift=(-0., 0.), save='no', displayedInfo=parameters)
-    #see_path_1(1, array([th, om]), r, 'inferno', name='th - om', shift=(0., 0.), var_case=2, save='no', displayedInfo=parameters)
-    #see_path_1(1., array([th, r]), v, 'Blues', name='th - r', shift=(0., 0.), var_case=2, save='no', displayedInfo=parameters)
-    #see_path_1(1, array([th, dr]), r, 'inferno', name='th - dr', shift=(0.0, 0.), var_case=2, save='no', displayedInfo=parameters)
-    #see_path_1(1, array([om, r]), v, 'inferno', name='om - r', shift=(0., 0.), var_case=2, save='no', displayedInfo=parameters)
-    #see_path_1(1., array([om, dr]), r, 'inferno', name='om - dr', shift=(0.1, 0.), var_case=4, save='no', displayedInfo=parameters)
-    #see_path_1(1., array([r, dr]), r, 'inferno', name='r dr', shift=(0.1, -0.), var_case=2, save='no', displayedInfo=parameters)
+    # see_path_1(lw, array([x2, y2]), v, color='jet', var_case=1, shift=(-0., 0.), save='save', displayedInfo=parameters)
+    # see_path_1(1, array([th, om]), r, 'inferno', name='th - om', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
+    # see_path_1(1., array([th, r]), v, 'Blues', name='th - r', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
+    # see_path_1(1, array([th, dr]), v, 'inferno', name='th - dr', shift=(0.0, 0.), var_case=2, save='save', displayedInfo=parameters)
+    # see_path_1(1, array([om, r]), v, 'inferno', name='om - r', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
+    # see_path_1(1., array([om, v]), r, 'inferno', name='om - dr', shift=(0.1, 0.), var_case=4, save='no', displayedInfo=parameters)
+    # see_path_1(1., array([r, dr]), r, 'inferno', name='r dr', shift=(0.1, -0.), var_case=2, save='save', displayedInfo=parameters)
 
     """
     see_path_1(1., array([dr*r, th]), v, 'Blues', name='1', shift=(-0., 0.), var_case=2, save='no', displayedInfo=parameters)
@@ -225,45 +227,77 @@ def display_path_atwood(sim, time_series):
     parameters[0] = r"Axe x : $\varphi_1 $  -  $\varphi_2$"
     parameters[1] = r"Axe y : $\omega_1$  -  $\omega_2$"
     parameters[2] = r"Axe c : $\varphi_2$  -  $\varphi_1$"
-    see_path(1, [array([x2, y2]), array([2*x2, 2*y2])],
-             [v, v], ["Blues", "viridis"],
-             var_case=2, save="no", displayedInfo=parameters)
+    # see_path(1, [array([x2, y2]), array([2*x2, 2*y2])],
+    #          [v, v], ["Blues", "viridis"],
+    #          var_case=2, save="no", displayedInfo=parameters)
 
-    #see_path_1(1, array([om, dr]), r, 'inferno', name='om - dr', shift=(0., 0.), var_case=4, save='save')
-
-
-def sim_and_draw(initial, params, tsim):
-    setup = {"t_sim": tsim, "fps": 30., "slowdown": 1., "oversample": 15}
-    simulation = Atwood_Simulation(params, initial, setup)
-    time_series = atwood_ode(simulation)
-    x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(simulation, time_series)
-    see_path(1., [array([x2, y2]), array([2*x2, 2*y2])], [v, v], ["Blues", "viridis"], var_case=2, save="no")
-
+    see_path_1(1, array([om, v]), r, 'inferno', name='om - dr', shift=(0., 0.), var_case=4, save='save')
     return
+
+
+def load_configuration(i):
+    
+    g, m = 9.81, 1.0
+    r, dr, om = 1., 0., 0.  # default intials
+
+    if 1 <= i <= 40:
+        mu_list = [
+            1.1185, 1.133, 1.172, 1.173, 1.278,
+            1.279, 1.338, 1.548, 1.555, 1.565,
+            2.000, 2.010, 2.140, 2.150, 2.165,
+            2.380, 2.900, 2.945, 3.000, 3.010,
+            3.125, 3.300, 3.410, 3.520, 3.867,
+            4.633, 4.734, 4.737, 4.745, 4.9986,
+            5.475, 5.680, 6.010, 6.013, 6.014,
+            6.114, 6.806, 8.150, 19.00, 46.00,
+        ]
+        M = mu_list[i - 1]
+        phi = 90.
+    elif 41 <= i <= 57:
+        mu_list = [
+            1.173, 1.337, 1.655, 1.904, 2.165,
+            2.394, 2.812, 3.125, 3.510, 3.520,
+            4.1775, 4.745, 4.80, 6.014, 7.242,
+            7.244, 16.00, 
+        ]
+        M = mu_list[i - 41]
+        phi = 150.
+    elif i == 58:
+        M = 16.0
+        phi = 35.0
+    elif i == 59:
+        M = 3.0
+        r, dr, phi, om = 0.25, 0., 20.054, 2.830  # these are degrees !
+    elif i == 60:
+        M = 1.527
+        r, dr, phi, om = 1.0, 0., 1.4 * 180 / np.pi, 0.0
+    else:
+        raise ValueError("Invalid configuration number")
+
+    params = {"g": g, "m": m, "M": M}
+    initials = {"r": r, "th": np.radians(phi), "dr": dr, "om": om}
+    return params, initials
+
 
 if __name__ == "__main__":
 
-    # initial, params = {"r": 1., "th": 150., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": 4.8}
-    # initial, params = {"r": 1, "th": np.degrees(1.4), "dr": 0, "om": 0}, {"g": 9.81, "m": 1., "M": 1.527}
-    # initial, params = {"r": 1., "th": 150., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": 7.244}
-    # initial, params = {"r": 1., "th": 150., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": 16.}
+    params = {
+        "g": 9.81, "m": 1., "M": 4.737
+    }
 
-    M_list = array(
-        [1.133, 1.172, 1.278, 1.337, 1.555, 1.655, 1.67, 1.904, 2.165, 2.394,
-         2.8121, 2.945, 3.125, 3.52, 3.867, 4.1775, 4.745, 5.475, 5.68, 6.014,
-         6.806, 7.244, 7.49, 7.7, 8.182370012, 8.182370165, 16, 19, 21, 24])
-    # M = 5.569 # 6.1187 # 6.114 # 4.126 # 4.233 # 1.565 # 2.9452 # 2.021  # good or not ?
-    initial, params = {"r": 1., "th": 90., "dr": 0., "om": 0.}, {"g": 9.81, "m": 1., "M": M_list[26]}
-    # initial, params = {"r": 1., "th": 90., "dr": 0., "om": 0.}, {"g": 1.0, "m": 1., "M": M_list[26]}
+    initial = {
+        "r": 1., "th": np.radians(90.), "dr": 0., "om": 0.
+    }
 
-    mode = "animation"
-    # mode = "path"
-    setup = {"t_sim": 1.*np.sqrt(1.0), "fps": 30., "slowdown": 1., "oversample": 15}
+    setup = {
+        "t_sim": 20.*np.sqrt(1.0), "fps": 30., "slowdown": 1., "oversample": 50
+    }
+
+
+    params, initial = load_configuration(60)
 
     simulation = Atwood_Simulation(params, initial, setup)
     solutions = atwood_ode(simulation)
 
-    if mode == "animation":
-        see_animation(simulation, solutions, save="")
-    elif mode == "path":
-        display_path_atwood(simulation, solutions)
+    see_animation(simulation, solutions, save="")
+    # display_path_atwood(simulation, solutions)

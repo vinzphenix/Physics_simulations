@@ -251,25 +251,25 @@ def path_triple_pendulum(sim, time_series):
         r"$\omega_3$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om3, width=fmt2, dcm=dcm2)
     ]
 
-    see_path_1(1, array([x2, y2]), v2, color='jet', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([x2, y2]), v2, color='jet', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
     see_path_1(1, array([x3, y3]), v3, color='viridis', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
     return 
 
 
 def load_configuration(i):
-    if i == 0:
+    if i == 1:
         phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.06113, 0.42713, 2.01926, 0, 0, 0
         m1, m2, m3, l1, l2, l3 = 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
-    elif i == 1:
+    elif i == 2:
         phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.20813379, -0.47019033, 0.80253405, -4.0363589, 4.42470966, 8.3046730
         m1, m2, m3, l1, l2, l3 = 0.1, 0.1, 0.1, 0.15, 0.1, 0.1
-    elif i == 2:
-        phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.22395671, 0.47832902, 0.22100014, -1.47138911, 1.29229544, -0.27559337
-        m1, m2, m3, l1, l2, l3 = 0.1, 0.2, 0.1, 0.15, 0.2, 0.3
     elif i == 3:
         phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.78539816, 0.79865905, 0.72867705, 0.74762606, 2.56473963, -2.05903234
         m1, m2, m3, l1, l2, l3 = 0.35, 0.2, 0.3, 0.3, 0.2, 0.25
     elif i == 4:
+        phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = -0.22395671, 0.47832902, 0.22100014, -1.47138911, 1.29229544, -0.27559337
+        m1, m2, m3, l1, l2, l3 = 0.1, 0.2, 0.1, 0.15, 0.2, 0.3
+    elif i == 5:
         phi1_0, phi2_0, phi3_0, om1_0, om2_0, om3_0 = 1.30564176, 1.87626915, 1.13990186, 0.75140557, 1.65979939, -2.31442362
         m1, m2, m3, l1, l2, l3 = 0.35, 0.2, 0.3, 0.3, 0.2, 0.25
     else:
@@ -297,10 +297,10 @@ if __name__ == "__main__":
         't_sim': 7., 'fps': 30, 'slowdown': 3., 'oversample': 10
     }
 
-    params, initials = load_configuration(3)
+    params, initials = load_configuration(5)
 
     sim = TriplePendulum(params, initials, setup)
     time_series = triple_pendulum_ode(sim)
 
-    see_animation(sim, time_series, save="")
-    # path_triple_pendulum(sim, time_series)
+    # see_animation(sim, time_series, save="")
+    path_triple_pendulum(sim, time_series)

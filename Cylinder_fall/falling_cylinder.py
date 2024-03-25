@@ -28,6 +28,8 @@ class Cylinder:
         
         self.th, self.om = initials['th'], initials['om']
         self.x, self.v = initials['x'], initials['v']
+
+        self.alphad, self.thd = np.degrees(self.alpha), np.degrees(self.th)
         
         self.t_sim, self.fps = setup["t_sim"], setup["fps"]
         self.slowdown = setup["slowdown"]  # . < 1 : faster; . = 1 : real time; 1 < . : slow motion
@@ -40,7 +42,7 @@ class Cylinder:
 
 
 def f(u, _, sim):
-    g, a = sim.g, radians(sim.alpha)
+    g, a = sim.g, sim.alpha
     R, M, L, m = sim.R, sim.M, sim.L, sim.m
     C, D1, D2 = sim.C, sim.D1, sim.D2
 
@@ -54,7 +56,7 @@ def f(u, _, sim):
 def cylinder_ode(sim):
 
     t = linspace(0., sim.t_sim, sim.n_steps+1)
-    U0 = array([radians(90 - sim.th - sim.alpha), sim.om, sim.x, sim.v])
+    U0 = array([np.pi/2 - sim.th - sim.alpha, sim.om, sim.x, sim.v])
 
     start = perf_counter()
     sol = odeint(f, U0, t, args=(sim,))
@@ -67,7 +69,7 @@ def cylinder_ode(sim):
 
 def cylinder_kinematics(sim, time_series):
     t, th, om, x, v = time_series
-    a = radians(sim.alpha)
+    a = sim.alpha
     phi = (x - sim.x) / sim.R 
 
     xc, yc = x * cos(a), -x * sin(a)  # position du centre du cercle
@@ -102,7 +104,7 @@ def see_animation(sim, time_series, save=""):
     t, th, om, x, v = time_series
     xc, yc, x1, y1, x2, y2, x3, y3, vx2, vy2, v2 = cylinder_kinematics(sim, time_series)
 
-    a = radians(sim.alpha)
+    a = sim.alpha
     xmin, xmax = amin(xc) - 4.0 * max(sim.R, sim.L), amax(xc) + 4.0 * max(sim.R, sim.L)
     ymin, ymax = amin(yc) - 1.5 * max(sim.R, sim.L), amax(yc) + 1.5 * max(sim.R, sim.L)
     L_X, L_Y = xmax - xmin, ymax - ymin
@@ -134,7 +136,7 @@ def see_animation(sim, time_series, save=""):
 
     circ = patches.Circle((xc[0], yc[0]), radius=sim.R, edgecolor=None, facecolor='lightgrey', lw=4)
 
-    ax.text(0.02, 0.06, r'$\alpha  = {:.2f} \: \rm [^\circ] $'.format(sim.alpha), fontsize=ftSz3, wrap=True,
+    ax.text(0.02, 0.06, r'$\alpha  = {:.2f} \: \rm [^\circ] $'.format(sim.alphad), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
     ax.text(0.02, 0.14, r'$\tau  = {:.2f} \: \rm [N \cdot m]$'.format(sim.C), fontsize=ftSz3, wrap=True,
             transform=ax.transAxes)
@@ -142,7 +144,7 @@ def see_animation(sim, time_series, save=""):
     ax.text(0.15, 0.14, r'$m  = {:.2f} \: \rm [kg]$'.format(sim.m), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
     ax.text(0.28, 0.06, r'$L  = {:.2f} \: \rm [m]$'.format(sim.L), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
     ax.text(0.28, 0.14, r'$R  = {:.2f} \: \rm [m]$'.format(sim.R), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
-    ax.text(0.72, 0.92, r'$\theta_0  = {:.2f} $'.format(sim.th), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
+    ax.text(0.72, 0.92, r'$\theta_0  = {:.2f} $'.format(sim.thd), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
     ax.text(0.72, 0.84, r'$\omega_0  = {:.2f} $'.format(sim.om), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
     ax.text(0.80, 0.92, r'$x_0  = {:.2f} $'.format(sim.x), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
     ax.text(0.80, 0.84, r'$v_0  = {:.2f} $'.format(sim.v), fontsize=ftSz3, wrap=True, transform=ax.transAxes)
@@ -225,7 +227,7 @@ def path_cylinder(sim, time_series):
         r"$L_{{pdlm}} \;\;$ = {:>{width}.{dcm}f} $\rm m$".format(sim.L, width=fmt1, dcm=dcm1),
         "", r"$C_{{wheel}}$ = {:>6.3f} $\rm N \, m$".format(sim.C), "",
         r"$g$  = {:>5.2f} $\rm m/s^2$".format(sim.g), "",
-        r"$\vartheta$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.th, width=fmt2, dcm=dcm2),
+        r"$\vartheta$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.thd, width=fmt2, dcm=dcm2),
         r"$\omega$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om, width=fmt2, dcm=dcm2),
         r"$x$ = {:>{width}.{dcm}f} $\rm m$".format(sim.x, width=fmt2, dcm=dcm2),
         r"$v$ = {:>{width}.{dcm}f} $\rm m/s$".format(sim.v, width=fmt2, dcm=dcm2)
@@ -241,6 +243,26 @@ def path_cylinder(sim, time_series):
     return
 
 
+def load_configuration(i):
+
+    g, D1, D2 = 9.81, 0., 0.
+    if i == 1:
+        alpha, R, M, L, m, C = 10.0, 0.80, 1.00, 1.00, 9.5, -14.65
+        th, om, x, v = 170, 0.00, 0.00, 1.00
+    else:
+        raise ValueError("Invalid configuration number")
+
+    params = {
+        'g': g, 'alpha': np.radians(alpha), 
+        'R': R, 'M': M, 'L': L, 'm': m, 
+        'C': C, 'D1': D1, 'D2': D2
+    }
+    initials = {
+        'th': np.radians(th), 'om': om, 'x': x, 'v': v
+    }
+    return params, initials
+
+
 if __name__ == "__main__":
 
     params = {
@@ -254,6 +276,8 @@ if __name__ == "__main__":
     setup = {
         "t_sim": 27.9, "fps": 30, "slowdown": 1., "oversample": 10
     }
+
+    params, initials = load_configuration(1)
     
     sim = Cylinder(params, initials, setup)
     time_series = cylinder_ode(sim)

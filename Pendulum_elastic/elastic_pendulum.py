@@ -25,7 +25,7 @@ class ElasticPendulum():
     def __init__(self, params, initials, setup):
         self.g, self.l, self.m, self.k, self.D = params["g"], params["l"], params["m"], params["k"], params["D"]
         self.th, self.om, self.r, self.dr = initials["th"], initials["om"], initials["r"], initials["dr"]
-        self.thd = np.degrees(self.th)
+        self.thd, self.omd = np.degrees(self.th), np.degrees(self.om)
        
         self.t_sim, self.fps = setup["t_sim"], setup["fps"]
         self.slowdown = setup["slowdown"]  # . < 1 : faster; . = 1 : real time; 1 < . : slow motion
@@ -98,7 +98,7 @@ def see_animation(sim, time_series, save="", phaseSpace=0):
     plt.rcParams['text.usetex'] = (save == "snapshot") or (save == "gif")
     
 
-    fig, axs = plt.subplots(1, 2, figsize=(13., 8.))
+    fig, axs = plt.subplots(1, 2, figsize=(13., 6.))
     ax, ax2 = axs
     ax.grid(ls=':')
     ax2.grid(ls=':')
@@ -224,7 +224,7 @@ def path_elastic_pendulum(sim, time_series):
         r"$k\:\:$ = {:>{width}.{dcm}f} $\rm N/m$".format(sim.k, width=fmt1, dcm=dcm1),
         "", r"$g\,$ = {:.2f} $\rm m/s^2$".format(sim.g), "",
         r"$\vartheta $ = {:>{width}.{dcm}f} $\rm deg$".format(sim.thd, width=fmt2, dcm=dcm2),
-        r"$\omega$ = {:>{width}.{dcm}f} $\rm deg/s$".format(sim.om, width=fmt2, dcm=dcm2),
+        r"$\omega$ = {:>{width}.{dcm}f} $\rm deg/s$".format(sim.omd, width=fmt2, dcm=dcm2),
         r"$r\,$ = {:>{width}.{dcm}f} $\rm m$".format(sim.r, width=fmt2, dcm=dcm2),
         r"$\dot r\,$ = {:>{width}.{dcm}f} $\rm m/s$".format(sim.dr, width=fmt2, dcm=dcm2)
     ]
@@ -233,12 +233,12 @@ def path_elastic_pendulum(sim, time_series):
     parameters[2] = r"Axe c : $acc$"
 
     see_path_1(1., array([x, y]), -acc, color='inferno', var_case=1, name='0', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([th, om]), speed, color='inferno', var_case=2, name='1', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([th, r]), speed, color='viridis', var_case=2, name='2', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([th, dr]), speed, color='viridis', var_case=2, name='3', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([om, r]), speed, color='viridis', var_case=2, name='4', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([om, dr]), speed, color='viridis', var_case=2, name='5', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, array([r, dr]), speed, color='viridis', var_case=2, name='6', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([th, om]), speed, color='inferno', var_case=2, name='1', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([th, r]), speed, color='viridis', var_case=2, name='2', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([th, dr]), speed, color='viridis', var_case=2, name='3', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([om, r]), speed, color='viridis', var_case=2, name='4', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([om, dr]), speed, color='viridis', var_case=2, name='5', shift=(0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(1, array([r, dr]), speed, color='viridis', var_case=2, name='6', shift=(0., 0.), save="no", displayedInfo=parameters)
 
     # see_path_1(1, array([x, y]), hypot(vx, vy), 'inferno', shift=(0., 0.), var_case=1, save=False)
     # see_path_1(1, array([x, y]), hypot(ddx, ddy), 'inferno_r', shift=(0.1, 0.1), var_case=1, save=False)
@@ -246,10 +246,43 @@ def path_elastic_pendulum(sim, time_series):
     return
 
 
-def load_configuration():
-    params = {"g": 9.81, "D": 0.0, "l": 0.7, "m": 1.00, "k": 199}
-    tmp = params["m"] * params["g"] / params["k"]
-    initials = {"th": radians(18), "om": 0., "r": tmp, "dr": -7}
+def load_configuration(i):
+
+    g = 9.81
+    if i == 1:
+        l, m, k = 0.7, 1.0, 100.
+        th, om, r, dr = 0., 80, m * g / k, -0.6
+    elif i == 2:
+        l, m, k = 0.7, 1.0, 100.
+        th, om, r, dr = 0., 80, 0.120, -0.7
+    elif i == 3:
+        l, m, k = 0.7, 1.0, 200.
+        th, om, r, dr = 2., 0., 0.05, -5.0
+    elif 4 <= i <= 8:
+        k_list = [206., 271.88, 185.5, 147.5, 101.9]
+        l, m, k = 0.5, 1.0, k_list[i-4]
+        th, om, r, dr = 0., 150., 0., 1.0
+    elif i == 9:
+        l, m, k = 0.7, 1.0, 1000.
+        th, om, r, dr = 170., 0., 0.01, 10.0
+    elif i == 10:
+        l, m, k = 0.7, 1.0, 98.8
+        th, om, r, dr = 45, 0., 0.5, 0.
+    elif i == 11:
+        l, m, k = 1.0, 1.0, 101.
+        th, om, r, dr = 30., 0., 0.7, 0.
+    elif i == 12:
+        l, m, k = 1.0, 1.0, 100.2
+        th, om, r, dr = 45, 0., 0.7, 0.
+    elif i == 13:
+        l, m, k = 1.0, 1.0, 30.2
+        th, om, r, dr = 10, 0., 0.875, 0.
+    elif i == 14:
+        l, m, k = 1.0, 1.0, 37.535
+        th, om, r, dr = 10, 0., 0.750, 0.
+
+    params = {"g": g, "D": 0.0, "l": l, "m": m, "k": k}
+    initials = {"th": np.radians(th), "om": np.radians(om), "r": r, "dr": dr}
     return params, initials
 
 
@@ -267,11 +300,11 @@ if __name__ == "__main__":
     }
 
     setup = {
-        "t_sim": 10., "fps": 30., 
+        "t_sim": 20., "fps": 30., 
         "slowdown": 1., "oversample": 10
     }
 
-    params, initials = load_configuration()
+    params, initials = load_configuration(14)
 
     sim = ElasticPendulum(params, initials, setup)
     time_series = elastic_pendulum_ode(sim)

@@ -31,6 +31,7 @@ def countDigits(a):
 def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0, 0),
                var_case=2, bar=False, save="no", displayedInfo=""):
     plt.style.use('dark_background')
+    colorarray = np.nan_to_num(colorarray)
 
     if save == "save" or save == "erase":
         fig = plt.figure(figsize=(16, 9))
@@ -39,16 +40,19 @@ def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0
         fig = plt.figure(figsize=(16 * 0.65, 9 * 0.65))
         infoPosition, infoHeight, infoSize = 0.875, 0.15, 11
     fig.canvas.set_window_title(name)
-
-    L_X, L_Y = amax(variables[0]) - amin(variables[0]), amax(variables[1]) - amin(variables[1])
+    
+    L_X = np.nanmax(variables[0]) - np.nanmin(variables[0])
+    L_Y = np.nanmax(variables[1]) - np.nanmin(variables[1])
+    print(L_X, L_Y)
     L_V = amax(colorarray) - amin(colorarray)
     if var_case == 1:
         x_m, y_m = amin(variables[0]) - 0.25 * L_X, amin(variables[1]) - 0.1 * L_Y
         x_M, y_M = amax(variables[0]) + 0.25 * L_X, amax(variables[1]) + 0.1 * L_Y
         ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect='equal')
     elif var_case == 2:
-        x_m, y_m = amin(variables[0]) - 0.20 * L_X, amin(variables[1]) - 0.15 * L_Y
-        x_M, y_M = amax(variables[0]) + 0.20 * L_X, amax(variables[1]) + 0.15 * L_Y
+        x_m, y_m = np.nanmin(variables[0]) - 0.20 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
+        x_M, y_M = np.nanmax(variables[0]) + 0.20 * L_X, np.nanmax(variables[1]) + 0.15 * L_Y
+        print(x_m, x_M, y_m, y_M)
         ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M))
     elif var_case == 3:
         x_m, y_m = amin(variables[0]) - 0.1 * L_X, amin(variables[1]) - 0.15 * L_Y
@@ -92,8 +96,10 @@ def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0
         path = directoryName + 'Figure_{}'.format(number + int(save == "save")) + ".png"
         print('number = {}'.format(number))
         plt.savefig(path, bbox_inches="tight")
+        plt.close(fig)
 
     plt.show()
+    return
 
 
 def see_path(lw, variables, colorarrays, colorList=('Inferno',),

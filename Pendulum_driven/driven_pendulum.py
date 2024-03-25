@@ -225,24 +225,26 @@ def path_driven_pendulum(sim, time_series):
 
 
 def load_configuration(i):
+    # resonnance at om1 = sqrt(g / l2)
+
     g, D, m = 9.81, 0.0, 1.0
     phi1, phi2, om2 = 0., 0., 0.
-    if i == 0:
+    if i == 1:
         l1, l2 = 0.1, 0.1
         om1 = 0.5 * sqrt(g / l2)
-    elif i == 1:
+    elif i == 2:
         l1, l2 = 0.1, 0.1
         om1 = 0.4 * sqrt(g / 0.1)
-    elif i == 2:
+    elif i == 3:
         l1, l2 = 0.2, 0.2 / sqrt(2)
         om1 = 0.4 * sqrt(g / l2)
-    elif i == 3:
-        l1, l2 = 0.1, 0.1
-        om1 = sqrt(g / l2)
-    elif i == 4:
+    elif 4 <= i <= 10:
         l1, l2 = 0.1, 0.4
-        c = [1., -0.333, 1/2, 2/3, 3/5, 9/17, 17/37]
-        om1 = sqrt(g / l2) * c[2]
+        c = [2/3, 1/2, -0.333, 3/5, 1., 9/17, 17/37]
+        om1 = sqrt(g / l2) * c[i-4]
+    else:
+        raise ValueError("Invalid configuration number.")
+
     params = {'g': g, 'l1': l1, 'l2': l2, 'D': D, 'm': m}
     initials = {'phi1': phi1, 'phi2': phi2, 'om1': om1, 'om2': om2}
     return params, initials
@@ -266,10 +268,10 @@ if __name__ == "__main__":
         't_sim': 60., 'fps': 30, 'slowdown': 1.0, 'oversample': 10
     }
 
-    params, initials = load_configuration(4)
+    params, initials = load_configuration(10)
 
     sim = DrivenPendulum(params, initials, setup)
     time_series = driven_pendulum_ode(sim)
 
-    see_animation(sim, time_series)
-    # path_driven_pendulum(sim, time_series)
+    # see_animation(sim, time_series)
+    path_driven_pendulum(sim, time_series)

@@ -10,7 +10,8 @@ from numpy import sin, cos, pi, arccos, sqrt, degrees, radians
 from time import perf_counter
 from tqdm import tqdm
 
-from double_pendulum_adim import db_pendulum_solver, see_animation, draw_image
+from double_pendulum_adim import dynamics, DoublePendulum, double_pendulum_ode, double_pendulum_kinematics, see_animation
+from Utils.Fixed_Path import see_path_1
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 
@@ -19,17 +20,7 @@ plt.rcParams["text.usetex"] = False
 plt.rcParams['font.family'] = 'serif'
 
 
-def dynamics(_, y_):
-    phi1, w1, phi2, w2 = y_
-    Cos, Sin = cos(phi1 - phi2), sin(phi1 - phi2)
-
-    f1 = (MU * Cos * (sin(phi2) - w1 * w1 * Sin) - L * MU * w2 * w2 * Sin - sin(phi1)) / (1. - MU * Cos * Cos)
-    f2 = Sin * (cos(phi1) + w1 * w1 + L * MU * w2 * w2 * Cos) / (L - L * MU * Cos * Cos)
-
-    return np.array([w1, f1, w2, f2])
-
-
-def jac(_, y_):
+def jac(_, y_, l, mu):
     phi1, w1, phi2, w2 = y_
     sin1, sin2 = sin(phi1), sin(phi2)
     cos1, cos2 = cos(phi1), cos(phi2)
@@ -61,11 +52,11 @@ def jac(_, y_):
     return J
 
 
-def event_phi1(_, y_):
+def event_phi1(_, y_, l, mu):
     return sin(y_[0] / 2.)
 
 
-def event_phi2(_, y_):
+def event_phi2(_, y_, l, mu):
     return sin(y_[2] / 2.)
 
 
@@ -81,7 +72,12 @@ def compute_intersections(U0, max_iter=50, display_info=True):
 
     st = perf_counter()
     while (len(events) < n_points) and (iter_nb < max_iter):
-        sol = solve_ivp(dynamics, [0, 200.], u_zero, method='LSODA', events=my_event, jac=jac, rtol=rtol, atol=atol)
+        sol = solve_ivp(
+            dynamics, [0, 200.], u_zero, 
+            method='LSODA', events=my_event, 
+            jac=jac, rtol=rtol, atol=atol, 
+            args=(L, MU)
+        )
         # sol = solve_ivp(dynamics, [0, 200.], u_zero, method='RK45', events=my_event, atol=1e-8, rtol=1.e-8)
         events = np.r_[events, sol.y_events[0]]
         u_zero = sol.y[:, -1]
@@ -152,7 +148,6 @@ def handle_new_point(event, list_U0, lines):
 
 
 def on_click(event, list_U0, lines):
-    print(event.button)
     if event.inaxes != ax:
         return
     if event.button == 1:
@@ -164,14 +159,6 @@ def on_click(event, list_U0, lines):
             scat.remove()
         list_U0.clear()
 
-    # elif event.button == 3:
-    #     print("ohé")
-    #     phi, om = event.xdata, event.ydata
-    #     U0 = get_U0(phi, om)
-    #     if U0 is None:
-    #         return
-    #     see_animation(*db_pendulum_solver(U0, L, MU, Tend=20, l1=1, m1=1.))
-
     elif event.button == 3:
         if len(lines) > 0:
             scat = lines.pop()
@@ -181,17 +168,31 @@ def on_click(event, list_U0, lines):
 
 
 def on_touch(event, list_U0, lines):
-    if (event.key == 'a') and (0 < len(list_U0)):  # start a simulation with the parameters from the last run
-        see_animation(*db_pendulum_solver(list_U0[-1].copy(), L, MU, Tend=20, l1=1, m1=1.))
+    def compute_sim(U0):
+        params = {'lambda': L, 'mu': MU}
+        setup = {'t_sim': 60.0, 'fps': 30, 'slowdown': 0.25, 'oversample': 5}
+        initials = dict(zip(['phi1', 'om1', 'phi2', 'om2'], U0.copy()))
+        sim = DoublePendulum(params, initials, setup)
+        time_series = double_pendulum_ode(sim)
+        return sim, time_series
 
-    elif (event.key == 'z') and (0 < len(list_U0)):  # same with a dialog box for parameters
-        see_animation(*db_pendulum_solver(list_U0[-1].copy(), L, MU, mode='animation_ask'))
+    if event.key == 'r':  # compute intersections with multiple random initial conditions
+        # plot_random_multiprocess(6, 10, list_U0)
+        plot_random(n_samples=10, U0_list=list_U0)
+        fig.canvas.draw()
+        return
 
-    elif (event.key == 'd') and (0 < len(list_U0)):  # display an image of the path
-        draw_image(*db_pendulum_solver(list_U0[-1].copy(), L, MU, Tend=20, sps=720, l1=1., m1=1.))
-
-    elif (event.key == 'e') and (0 < len(list_U0)):  # same with a dialog box for parameters
-        draw_image(*db_pendulum_solver(list_U0[-1].copy(), L, MU, sps=720, mode='draw_ask'))
+    elif event.key == 'g':  # display points "uniformly" spread around the section
+        for i in range(200):
+            var_1, var_2 = pick_random(random_list)
+            ax.plot([var_1], [var_2], 'o', markersize=3, color='C0')
+        fig.canvas.draw()
+        return
+    
+    elif event.key == 'n':  # new series of points
+        handle_new_point(event, list_U0, lines)
+        fig.canvas.draw()
+        return
 
     elif (event.key == 'c') and (0 < len(list_U0)):  # continue the process with the last trajectory
         points = compute_intersections(last_run, display_info=False)
@@ -200,28 +201,29 @@ def on_touch(event, list_U0, lines):
         if do_save:
             save_file(points, merge=True)
         fig.canvas.draw()
+        return
 
-    elif event.key == 'r':  # compute intersections with multiple random initial conditions
-        # plot_random_multiprocess(6, 10, list_U0)
-        plot_random(n_samples=10, U0_list=list_U0)
-        fig.canvas.draw()
-
-    elif event.key == 'g':  # display points "uniformly" spread around the section
-        for i in range(200):
-            var_1, var_2 = pick_random(random_list)
-            ax.plot([var_1], [var_2], 'o', markersize=3, color='C0')
-        fig.canvas.draw()
-
-    elif event.key == 'x':  # start simulation at coordinates of the mouse
+    # launch a simulation
+    elif event.key == 'a' and 0 < len(list_U0):
+        sim, time_series = compute_sim(list_U0[-1].copy())
+        see_animation(sim, time_series)
+    
+    # display an image of the path
+    elif event.key == 'd' and 0 < len(list_U0):
+        sim, time_series = compute_sim(list_U0[-1].copy())
+        x1, y1, v1, x2, y2, v2, ac2 = double_pendulum_kinematics(sim, time_series)
+        see_path_1(1.5, np.array([x2, y2]), v2, cmap='inferno')
+    
+    # start simulation at coordinates of the mouse
+    elif event.key == 'x':
         phi, om = event.xdata, event.ydata
         U0 = get_U0(phi, om)
         if U0 is None:
             return
-        see_animation(*db_pendulum_solver(U0, L, MU, Tend=20, l1=1, m1=1.))
+        sim, time_series = compute_sim(U0)
+        see_animation(sim, time_series)
 
-    elif event.key == 'n':  # new series of points
-        handle_new_point(event, list_U0, lines)
-        fig.canvas.draw()
+    return
 
 
 def create_fig():
@@ -272,28 +274,6 @@ def interactive_func():
     -> a : start an animation of the double pendulum using the last run of the Poincare section\n")
     return
 
-
-# def plot_random_one_thread(n_samples, U0_list):
-#     init_conditions = []
-#
-#     for i in range(n_samples):
-#         phi = 0.99 * phi_max * np.random.uniform(-1, 1)
-#         om = f_y(phi) * np.random.uniform(-1, 1)
-#         u_zero = get_U0(phi, om)
-#         init_conditions.append(u_zero)
-#         U0_list.append(u_zero)
-#
-#     points_list = []
-#     st = perf_counter()
-#     for U0 in init_conditions:
-#         points_list.append(compute_intersections(U0))
-#     print("Time taken UNITHREAD : {:.2f} s".format(perf_counter() - st))
-#
-#     for points in points_list:
-#         ax.plot(points[:, 0], points[:, 1], 'o', markersize=5., alpha=0.4, color='black')
-#         # scat = ax.scatter(points[:, 0], points[:, 1], norm=normalize, s=1, c=points[:, 2], cmap=cmap)
-#
-#     return
 
 def create_random(nx, ny):
     my_list = []
