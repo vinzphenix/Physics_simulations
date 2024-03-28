@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from matplotlib.collections import LineCollection
-from numpy import array, amax, concatenate, amin
 
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'
@@ -28,8 +27,10 @@ def countDigits(a):
         return 1
 
 
-def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0, 0),
-               var_case=2, bar=False, save="no", displayedInfo=""):
+def see_path_1(
+        lw, variables, colorarray, color='jet', name='Figure_1', 
+        shift=(0, 0), var_case=2, bar=False, save="no", displayedInfo=""
+    ):
     plt.style.use('dark_background')
     colorarray = np.nan_to_num(colorarray)
 
@@ -43,20 +44,18 @@ def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0
     
     L_X = np.nanmax(variables[0]) - np.nanmin(variables[0])
     L_Y = np.nanmax(variables[1]) - np.nanmin(variables[1])
-    print(L_X, L_Y)
-    L_V = amax(colorarray) - amin(colorarray)
+    L_V = np.nanmax(colorarray) - np.nanmin(colorarray)
     if var_case == 1:
-        x_m, y_m = amin(variables[0]) - 0.25 * L_X, amin(variables[1]) - 0.1 * L_Y
-        x_M, y_M = amax(variables[0]) + 0.25 * L_X, amax(variables[1]) + 0.1 * L_Y
+        x_m, y_m = np.nanmin(variables[0]) - 0.25 * L_X, np.nanmin(variables[1]) - 0.1 * L_Y
+        x_M, y_M = np.nanmax(variables[0]) + 0.25 * L_X, np.nanmax(variables[1]) + 0.1 * L_Y
         ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect='equal')
     elif var_case == 2:
-        x_m, y_m = np.nanmin(variables[0]) - 0.20 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
-        x_M, y_M = np.nanmax(variables[0]) + 0.20 * L_X, np.nanmax(variables[1]) + 0.15 * L_Y
-        print(x_m, x_M, y_m, y_M)
+        x_m, y_m = np.nanmin(variables[0]) - 0.50 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
+        x_M, y_M = np.nanmax(variables[0]) + 0.50 * L_X, np.nanmax(variables[1]) + 0.15 * L_Y
         ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M))
     elif var_case == 3:
-        x_m, y_m = amin(variables[0]) - 0.1 * L_X, amin(variables[1]) - 0.15 * L_Y
-        x_M, y_M = amax(variables[0]) + 0.1 * L_X, amax(variables[1]) + 0.6 * L_Y
+        x_m, y_m = np.nanmin(variables[0]) - 0.1 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
+        x_M, y_M = np.nanmax(variables[0]) + 0.1 * L_X, np.nanmax(variables[1]) + 0.6 * L_Y
         ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M))
         fig.set_size_inches(6, 6 * 9 / 5)
     elif var_case == 4:
@@ -68,8 +67,8 @@ def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0
     cmap = plt.get_cmap(color)
     norm = plt.Normalize(colorarray.min() - L_V * shift[0], colorarray.max() + L_V * shift[1])
 
-    points = array(variables).T.reshape(-1, 1, 2)
-    segments = concatenate([points[:-1], points[1:]], axis=1)
+    points = np.array(variables).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
     line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
     line.set_array(colorarray)
     ax.add_collection(line)
@@ -102,8 +101,10 @@ def see_path_1(lw, variables, colorarray, color='jet', name='Figure_1', shift=(0
     return
 
 
-def see_path(lw, variables, colorarrays, colorList=('Inferno',),
-             shifts=None, var_case=1, save="no", displayedInfo=""):
+def see_path(
+        lw, variables, colorarrays, colorList=('Inferno',),
+        shifts=None, var_case=1, save="no", displayedInfo=""
+    ):
     if shifts is None:
         shifts = [(0, 0), (0, 0)]
     n = len(variables)
@@ -120,8 +121,8 @@ def see_path(lw, variables, colorarrays, colorList=('Inferno',),
 
     x_min, x_max, y_min, y_max = float('inf'), -float('inf'), float('inf'), -float('inf')
     for x, y in variables:
-        x_min, y_min = min(x_min, amin(x)), min(y_min, amin(y))
-        x_max, y_max = max(x_max, amax(x)), max(y_max, amax(y))
+        x_min, y_min = min(x_min, np.nanmin(x)), min(y_min, np.nanmin(y))
+        x_max, y_max = max(x_max, np.nanmax(x)), max(y_max, np.nanmax(y))
     L_X, L_Y = x_max - x_min, y_max - y_min
 
     if var_case == 1:
@@ -138,12 +139,12 @@ def see_path(lw, variables, colorarrays, colorList=('Inferno',),
     ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect=aspect)
 
     for variable, colorarray, color, shift in zip(variables, colorarrays, colorList, shifts):
-        cmap, L_V = plt.get_cmap(color), amax(colorarray) - amin(colorarray)
+        cmap, L_V = plt.get_cmap(color), np.nanmax(colorarray) - np.nanmin(colorarray)
         # norm = plt.Normalize(0, colorarray.max() * 1.05)
         norm = plt.Normalize(colorarray.min() - L_V * shift[0], colorarray.max() + L_V * shift[1])
 
-        points = array(variable).T.reshape(-1, 1, 2)
-        segments = concatenate([points[:-1], points[1:]], axis=1)
+        points = np.array(variable).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
         line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
         line.set_array(colorarray)
         ax.add_collection(line)

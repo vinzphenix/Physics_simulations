@@ -294,7 +294,7 @@ if __name__ == "__main__":
     }
 
 
-    params, initial = load_configuration(60)
+    params, initial = load_configuration(10)
 
     simulation = Atwood_Simulation(params, initial, setup)
     solutions = atwood_ode(simulation)

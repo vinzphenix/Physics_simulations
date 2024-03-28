@@ -10,7 +10,7 @@ from numpy import sin, cos, pi, arccos, sqrt, degrees, radians
 from time import perf_counter
 from tqdm import tqdm
 
-from double_pendulum_adim import dynamics, DoublePendulum, double_pendulum_ode, double_pendulum_kinematics, see_animation
+from Pendulum_2.double_pendulum import dynamics, DoublePendulum, double_pendulum_ode, double_pendulum_kinematics, see_animation
 from Utils.Fixed_Path import see_path_1
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
