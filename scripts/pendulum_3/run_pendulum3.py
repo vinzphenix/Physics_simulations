@@ -1,7 +1,7 @@
 import physicsim.pendulum_3 as tp_pendulum
 import numpy as np
 from physicsim.simulation import countDigits
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 from numpy import pi, sqrt
 
 
@@ -62,8 +62,8 @@ def display(sim, wrap=False):
         r"$\omega_3$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om3, width=fmt2, dcm=dcm2),
     ]
 
-    # see_path_1(1, np.array([x2, y2]), v2, color='jet', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([x3, y3]), v3, color='viridis', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
+    # see_path_1(x2, y2, v2, colors='viridis', var_case=1, save="no", displayedInfo=parameters)
+    see_path(x3, y3, v3, colors='viridis', var_case=1, save="no", displayedInfo=parameters)
     return
 
 if __name__ == "__main__":

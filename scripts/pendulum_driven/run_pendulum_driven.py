@@ -1,7 +1,7 @@
 import physicsim.pendulum_driven as dr_pendulum
 import numpy as np
 from physicsim.simulation import countDigits
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 
 
 def load_configuration(i):
@@ -34,7 +34,6 @@ def load_configuration(i):
     return params, initials
 
 
-import matplotlib.pyplot as plt
 def display(sim, wrap=False):
     
     if wrap:
@@ -66,19 +65,16 @@ def display(sim, wrap=False):
         r"$\omega_2$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om2, width=fmt2, dcm=dcm2)
     ]
 
-    see_path_1(1, np.array([x2, y2]), ac2, color='Blues', var_case=1, shift=(-0., 0.), save="no", displayedInfo=parameters)
+    # see_path(x2, y2, ac2, colors='Blues', var_case=1, save="no", displayedInfo=parameters)
 
     parameters[0] = r"Axe x : $\varphi_1 + \varphi_2$"
     parameters[1] = r"Axe y : $\omega_1 + \omega_2$"
     parameters[2] = r"Axe c : $v_2 \; \sqrt{a_2}$"
-    # see_path_1(
-    #     2., 
-    #     np.array([phi2, om2]), 
-    #     -np.sqrt(ac2)*v2, 
-    #     color='inferno', var_case=2, 
-    #     shift=(-0., 0.), 
-    #     save="no", displayedInfo=parameters
-    # )
+    see_path(
+        phi2, om2, -np.sqrt(ac2)*v2,
+        colors='inferno', var_case=2,
+        save="no", displayedInfo=parameters
+    )
     
     return
 
@@ -95,13 +91,13 @@ if __name__ == "__main__":
     }
 
     setup = {
-        't_sim': 2000., 'fps': 30, 'slowdown': 1.0, 'oversample': 10
+        't_sim': 200., 'fps': 30, 'slowdown': 0.2, 'oversample': 10
     }
 
-    params, initials = load_configuration(11)
+    params, initials = load_configuration(5)
 
     sim = dr_pendulum.DrivenPendulum(setup, params, initials)
     sim.solve_ode()
-    # sim.animate(save="no", wrap=False)
+    sim.animate(save="no", wrap=False)
 
-    display(sim, wrap=True)
+    # display(sim, wrap=True)

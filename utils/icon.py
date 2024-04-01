@@ -4,6 +4,15 @@ import matplotlib.patches as patches
 from numpy import sin, cos, tan, pi
 from operator import sub
 
+from physicsim.pendulum_atwood import AtwoodPendulum
+from physicsim.cylinder_slide import Cylinder
+from physicsim.pendulum_driven import DrivenPendulum
+from physicsim.pendulum_2 import DoublePendulum
+from physicsim.pendulum_3 import TriplePendulum
+from physicsim.pendulum_elastic import PendulumElastic
+from physicsim.pendulum_vertical import VerticalPendulum
+from physicsim.pendulum_horiztontal import HorizontalPendulum
+
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.usetex'] = False
 ftSz1, ftSz2, ftSz3 = 20, 17, 14
@@ -131,11 +140,19 @@ def map_xy(x, y, ax, shift_x, shift_y, scale_x, scale_y, pad_x, pad_y):
     return xnew, ynew
     
     
-def icon_double_pendulum(ax, info, fx, fy, pad, color, driven=False):
-    l1, l2, m1, m2 = info["l1"], info["l2"], info["m1"], info["m2"]
-    l3, m3 = info.get('l3', -1), info.get('m3', 0.)
-    phi1, phi2, om1, om2 = info["phi1"], info["phi2"], info["om1"], info["om2"]
-    phi3, om3 = info.get('phi3', -1), info.get('om3', -1)
+def icon_double_pendulum(ax, sim, fx, fy, pad, color, driven=False):
+    l1, l2 = sim.l1, sim.l2
+    if not driven:
+        m1, m2 = sim.m1, sim.m2
+    else:
+        m1, m2 = 1., 1.
+    phi1, phi2, om1, om2 = sim.phi1, sim.phi2, sim.om1, sim.om2
+    if hasattr(sim, 'l3'):
+        l3, m3 = sim.l3, sim.m3
+        phi3, om3 = sim.phi3, sim.om3
+    else:
+        l3, m3 = -1, 0.
+        phi3, om3 = 0., 0.
     w_disp, h_disp = get_display(ax)
     
     x0, y0 = 0., 0.
@@ -148,7 +165,13 @@ def icon_double_pendulum(ax, info, fx, fy, pad, color, driven=False):
     
     data_xmin, data_xmax = min(0., x1, x2, x3), max(0., x1, x2, x3)
     data_ymin, data_ymax = min(0., y1, y2, y3), max(0., y1, y2, y3)
+    delta_x, delta_y = data_xmax - data_xmin, data_ymax - data_ymin
+    if delta_x < 1e-6:
+        data_xmin, data_xmax = data_xmin - delta_y*0.1, data_xmax + delta_y*0.1
+    if delta_y < 1e-6:
+        data_ymin, data_ymax = data_ymin - delta_x*0.1, data_ymax + delta_x*0.1
     icon_bounds = [data_xmin, data_xmax, data_ymin, data_ymax]
+    
     scl_x, scl_y, pad_x, pad_y = compute_scaling(ax, icon_bounds, fx, fy, pad)
 
     args = [ax, data_xmax, data_ymin, scl_x, scl_y, pad_x, pad_y]
@@ -159,7 +182,7 @@ def icon_double_pendulum(ax, info, fx, fy, pad, color, driven=False):
         
     ls = ':' if driven else '-'
     ms = 15*(0.1*max(w_disp, h_disp))
-    ax.plot([ox], [oy], 'o', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # center
+    ax.plot([ox], [oy], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # center
     ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(m1/(m1+m2+m3)), color=color, zorder=1) # node 1
     ax.plot([x2], [y2], 'o', ms=ms*np.sqrt(m2/(m1+m2+m3)), color=color, zorder=1) # node 2
     ax.plot([ox, x1], [oy, y1], ls=ls, lw=2, color=color, alpha=0.8, zorder=0) # segment 1
@@ -182,9 +205,9 @@ def icon_double_pendulum(ax, info, fx, fy, pad, color, driven=False):
     return
 
 
-def icon_atwood(ax, info, fx, fy, pad, color):
-    M, m, d, L = info["M"], info["m"], info["d"], info["L"]
-    r0, v0, th0, om0 = info["r"], info["v"], info["th"], info["om"]
+def icon_atwood(ax, sim, fx, fy, pad, color):
+    M, m, d, L = sim.M, sim.m, sim.d, sim.L
+    r0, v0, th0, om0 = sim.r, sim.dr, sim.th, sim.om
     w_disp, h_disp = get_display(ax)
     
     x0, y0 = -d, -L+d+r0
@@ -208,8 +231,8 @@ def icon_atwood(ax, info, fx, fy, pad, color):
     
     ms = 15*(0.1*max(w_disp, h_disp))
     ax.plot([x0], [y0], 'o', ms=ms*np.sqrt(M/(m+M)), color=color, zorder=1) # big mass
-    ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
-    ax.plot([x2], [y2], 'o', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
+    ax.plot([x1], [y1], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
+    ax.plot([x2], [y2], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
     ax.plot([x3], [y3], 'o', ms=ms*np.sqrt(m/(m+M)), color=color, zorder=1) # small mass
     ax.plot([x0, x1, x2, x3], [y0, y1, y2, y3], '-', lw=2, color=color, alpha=0.8, zorder=0) # segment 1
     
@@ -231,9 +254,9 @@ def icon_atwood(ax, info, fx, fy, pad, color):
     return
     
 
-def icon_moving_pendulum(ax, info, fx, fy, pad, color, vertical=True):
-    l, m, M, F, w = info["l"], info["m"], info["M"], info["F"], info["w"]
-    phi0, om0, x0, v0 = info["phi"], info["om"], info["x"], info["v"]
+def icon_moving_pendulum(ax, sim, fx, fy, pad, color, vertical=True):
+    l, m, M, F, w = sim.l, sim.mp, sim.mb, sim.F, sim.w
+    phi0, om0, x0, v0 = sim.phi, sim.om, sim.x, sim.dx
     w_disp, h_disp = get_display(ax)
     
     x0, y0 = 0., 0.
@@ -289,7 +312,7 @@ def icon_moving_pendulum(ax, info, fx, fy, pad, color, vertical=True):
 
     org, dst = orgs[2], dsts[2]
     arrow_pts, arrow_head, arrow_tail = get_double_straight_arrow(org, dst)
-    print(arrow_pts, arrow_head, arrow_tail)
+    # ws(arrow_pts, arrow_head, arrow_tail)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
     ax.plot(arrow_pts_x, arrow_pts_y, color=color, alpha=0.5)
     for arrow in [arrow_head, arrow_tail]:
@@ -299,9 +322,9 @@ def icon_moving_pendulum(ax, info, fx, fy, pad, color, vertical=True):
     return
 
 
-def icon_cylinder(ax, info, fx, fy, pad, color):
-    tau, a, m, M, R, L = -info["tau"], info["alpha"], info["m"], info["M"], info["R"], info["L"]
-    th0, om0, x0, v0 = pi/2 - info["th"] - a, info["om"], info["x"], info["v"]
+def icon_cylinder(ax, sim, fx, fy, pad, color):
+    C, a, m, M, R, L = sim.C, sim.alpha, sim.m, sim.M, sim.R, sim.L
+    th0, om0, x0, v0 = sim.th, sim.om, sim.x, sim.dx
     w_disp, h_disp = get_display(ax)
     
     x0, y0 = 0., 0.  # disk center
@@ -312,7 +335,7 @@ def icon_cylinder(ax, info, fx, fy, pad, color):
     x3, y3 = +slope_size/2., 0. - R / cos(a) - tan(a) * (+slope_size/2. - 0.)  # slope bottom
     x4, y4 = -slope_size/2., 0. - R / cos(a) - tan(a) * (+slope_size/2. - 0.)  # slope bottom
 
-    torque_pos = 3*pi/4
+    torque_pos = 2*pi/4
     x5, y5 = R * cos(torque_pos), R * sin(torque_pos)  # point on disk
     x6, y6 = 1.5*R * cos(torque_pos), 1.5*R * sin(torque_pos)  # point on disk
 
@@ -325,7 +348,7 @@ def icon_cylinder(ax, info, fx, fy, pad, color):
     tmp = np.array([R * cos(tmp_th + a), -R * sin(tmp_th + a)])
     orgs.append(tmp)
     dsts.append(tmp)
-    oms = [om0, tau]
+    oms = [om0, -C]
     rads = [L/2, 1.25*R]
     
     data_xmin, data_xmax = min(x0, x1, x2, x3), max(y0, x1, x2, x3)
@@ -361,7 +384,7 @@ def icon_cylinder(ax, info, fx, fy, pad, color):
         
     return
 
-def draw_icon(ax, name, info, fraction_x=0.15, fraction_y=0.15, pad=0.02, color="lightgrey"):
+def draw_icon(ax, name, sim, fraction_x=0.15, fraction_y=0.15, pad=0.02, color="lightgrey"):
     """
     fraction indicates the maximum width of the logo as a % of full figure width
     """
@@ -370,46 +393,63 @@ def draw_icon(ax, name, info, fraction_x=0.15, fraction_y=0.15, pad=0.02, color=
     ax.set_ylim(ax.get_ylim())
 
     if name == "double pendulum":
-        icon_double_pendulum(ax, info, fraction_x, fraction_y, pad, color)
+        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color)
     elif name == "triple pendulum":
-        icon_double_pendulum(ax, info, fraction_x, fraction_y, pad, color)
+        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color)
     elif name == "driven pendulum":
-        icon_double_pendulum(ax, info, fraction_x, fraction_y, pad, color, driven=True)
+        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color, driven=True)
     elif name == "atwood":
-        icon_atwood(ax, info, fraction_x, fraction_y, pad, color)
+        icon_atwood(ax, sim, fraction_x, fraction_y, pad, color)
     elif name == "vertical pendulum":
-        icon_moving_pendulum(ax, info, fraction_x, fraction_y, pad, color, vertical=True)
+        icon_moving_pendulum(ax, sim, fraction_x, fraction_y, pad, color, vertical=True)
     elif name == "horizontal pendulum":
-        icon_moving_pendulum(ax, info, fraction_x, fraction_y, pad, color, vertical=False)
+        icon_moving_pendulum(ax, sim, fraction_x, fraction_y, pad, color, vertical=False)
     elif name == "cylinder":
-        icon_cylinder(ax, info, fraction_x, fraction_y, pad, color)
+        icon_cylinder(ax, sim, fraction_x, fraction_y, pad, color)
 
     return
 
 
-fig, ax = plt.subplots(1, 1, figsize=(10., 10.), constrained_layout=False)
-fig.tight_layout()
-ax.plot([-1., 1000.], [0., 3.], '-o')
+if __name__ == "__main__":
 
-info = {'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3., 'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
-draw_icon(ax, "double pendulum", info, 0.50, 0.25, 0.04)
+    setup = {"t_sim": 30., "fps": 30., "slowdown": 1., "oversample": 5}
 
-# info = {'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3., 'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
-# draw_icon(ax, "driven pendulum", info, 0.50, 0.25, 0.04)
+    fig, ax = plt.subplots(1, 1, figsize=(10., 10.), constrained_layout=False)
+    fig.tight_layout()
+    ax.plot([-1., 1000.], [0., 3.], '-o')
 
-# info = {'l1': 1.0, 'l2': 2.0, 'l3': 2.0, 'm1': 2.0, 'm2': 3., 'm3':2.5, 'phi1': 1, 'phi2': 1-pi/2, 'phi3': -pi/4, 'om1': 2.,'om2': 3., 'om3': 0}
-# draw_icon(ax, "triple pendulum", info, 0.25, 0.25, 0.04)
+    prm = {'g': 9.81, 'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3.}
+    initials = {'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
+    sim = DoublePendulum(setup, prm, initials)
+    draw_icon(ax, "double pendulum", sim, 0.50, 0.25, 0.04)
 
-# info = {'M': 5.0, 'm': 4.0, 'd': 1.0, 'L': 3., 'r': 0.75, 'v': 0.0, 'th': -pi/4, 'om': 1.}
-# draw_icon(ax, "atwood", info, 0.25, 0.25, 0.04)
+    # prm = {'g': 9.81, 'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3.}
+    # initials = {'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
+    # sim = DrivenPendulum(setup, prm, initials)
+    # draw_icon(ax, "driven pendulum", sim, 0.50, 0.25, 0.04)
 
-# info = {'l': 1.0, 'm': 5.0, 'M': 4.0, 'F': 1.0, 'w': 3., 'phi': 0.75, 'om': 3.0, 'x': 0., 'v': 0.4}
-# draw_icon(ax, "vertical pendulum", info, 0.25, 0.25, 0.04)
+    # prm = {'g': 9.81, 'l1': 1.0, 'l2': 2.0, 'l3': 2.0, 'm1': 2.0, 'm2': 3., 'm3':2.5}
+    # initials = {'phi1': 1, 'phi2': 1-pi/2, 'phi3': -pi/4, 'om1': 2.,'om2': 3., 'om3': 0}
+    # sim = TriplePendulum(setup, prm, initials)
+    # draw_icon(ax, "triple pendulum", sim, 0.25, 0.25, 0.04)
 
-# info = {'tau': -15.65, 'alpha': np.radians(10), 'R': 0.8, 'M': 9.5, 'm': 1.0, 'L': 1., 'th': np.radians(170), 'om': 0.0, 'x': 0., 'v': 1.0}
-# draw_icon(ax, "cylinder", info, 0.25, 0.25, 0.04)
+    # prm = {'g': 9.81, 'M': 5.0, 'm': 4.0}
+    # initials = {'r': 0.75, 'dr': 0.0, 'th': -pi/4, 'om': 1.}
+    # sim = AtwoodPendulum(setup, prm, initials)
+    # draw_icon(ax, "atwood", sim, 0.25, 0.25, 0.04)
+
+    # prm = {'g': 9.81, 'l': 1.0, 'mb': 5.0, 'mp': 4.0, 'F': 1.0, 'w': 3.}
+    # initials = {'phi': 0.75, 'om': 3.0, 'x': 0., 'dx': 0.4}
+    # sim = VerticalPendulum(setup, prm, initials)
+    # draw_icon(ax, "vertical pendulum", sim, 0.25, 0.25, 0.04)
+
+    # prm = {
+    #     'C': -15.65, 'alpha': np.radians(10), 'R': 0.8, 'M': 9.5, 'm': 1.0, 'L': 1.,
+    #     'g': 9.81, 'D1': 0., 'D2': 0.
+    # }
+    # initials = {'th': np.radians(170), 'om': 0.0, 'x': 0., 'dx': 1.0}
+    # sim = Cylinder(setup, prm, initials)
+    # draw_icon(ax, "cylinder", sim, 0.25, 0.25, 0.04)
 
 
-plt.show()
-
-
+    plt.show()

@@ -1,5 +1,5 @@
 import physicsim.cylinder_slide as fcyl
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 from physicsim.simulation import countDigits
 import numpy as np
 
@@ -36,8 +36,9 @@ def display(sim):
     parameters[2] = r"Axe c : $\vartheta$"
 
     s = np.s_[:245:-1]
-    see_path_1(
-        2, np.array([om[s], dx[s]]), th[s], color='Blues', shift=(0.15, -0.15),
+    see_path(
+        om[s], dx[s], th[s],
+        lws=2., colors='Blues', shifts=(0.15, -0.15),
         var_case=2, save="no", displayedInfo=parameters
     )
     return
@@ -79,13 +80,13 @@ if __name__ == "__main__":
         'th': np.radians(179.), 'om': -0.10, 'x': 0.00, 'dx': -1.00
     }
     setup = {
-        "t_sim": 10.0, "fps": 30, "slowdown": 1., "oversample": 10
+        "t_sim": 64.0, "fps": 30, "slowdown": 1., "oversample": 10
     }
 
     prm, initials = load_configuration(1)
 
     sim = fcyl.Cylinder(setup, params=prm, initials=initials)
     sim.solve_ode()
-    sim.animate(save="no")
+    # sim.animate(save="no")
 
-    # display(sim)
+    display(sim)

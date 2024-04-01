@@ -1,5 +1,5 @@
 import physicsim.pendulum_atwood as atwood
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 import numpy as np
 
 def display(sim):
@@ -14,22 +14,22 @@ def display(sim):
     parameters[1] = r"Axe y : $r$"
     parameters[2] = r"Axe c : $v^2$"
 
-    # see_path_1(lw, np.array([x2, y2]), v, color='jet', var_case=1, shift=(-0., 0.), save='save', displayedInfo=parameters)
-    # see_path_1(1, np.array([th, om]), r, 'inferno', name='th - om', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
-    # see_path_1(1., np.array([th, r]), v, 'Blues', name='th - r', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
-    # see_path_1(1, np.array([th, dr]), v, 'inferno', name='th - dr', shift=(0.0, 0.), var_case=2, save='save', displayedInfo=parameters)
-    # see_path_1(1, np.array([om, r]), v, 'inferno', name='om - r', shift=(0., 0.), var_case=2, save='save', displayedInfo=parameters)
-    # see_path_1(1., np.array([om, v]), r, 'inferno', name='om - dr', shift=(0.1, 0.), var_case=4, save='no', displayedInfo=parameters)
-    # see_path_1(1., np.array([r, dr]), r, 'inferno', name='r dr', shift=(0.1, -0.), var_case=2, save='save', displayedInfo=parameters)
+    see_path(x2, y2, v, colors='jet', var_case=1, save='', displayedInfo=parameters)
 
-    parameters[0] = r"Axe x : $\varphi_1 $  -  $\varphi_2$"
+    parameters[0] = r"Axe x : $\varphi_1$  -  $\varphi_2$"
     parameters[1] = r"Axe y : $\omega_1$  -  $\omega_2$"
     parameters[2] = r"Axe c : $\varphi_2$  -  $\varphi_1$"
-    # see_path(1, [np.array([x2, y2]), np.array([2*x2, 2*y2])],
-    #          [v, v], ["Blues", "viridis"],
-    #          var_case=2, save="no", displayedInfo=parameters)
 
-    see_path_1(1, np.array([th, om]), v, 'inferno', name='om - dr', shift=(0., 0.), var_case=2, save='')
+    see_path(
+        th, om, v, 
+        colors='inferno', shifts=(0., 0.), var_case=2, 
+        name='om - dr', save='', displayedInfo=parameters
+    )
+    see_path(
+        [x2, 2*x2], [y2, 2*y2], [v, v],
+        colors=['Blues', 'viridis'], var_case=2,
+        save="no", displayedInfo=parameters
+    )
     return
 
 
@@ -88,13 +88,13 @@ if __name__ == "__main__":
     }
 
     setup = {
-        "t_sim": 260, "fps": 30., "slowdown": 1.0, "oversample": 50
+        "t_sim": 50, "fps": 30., "slowdown": 1.0, "oversample": 50
     }
 
     params, initials = load_configuration(4)
 
     sim = atwood.AtwoodPendulum(setup, params, initials)
     sim.solve_ode()
-    # sim.animate(save="no")
+    sim.animate(save="no")
 
-    display(sim)
+    # display(sim)

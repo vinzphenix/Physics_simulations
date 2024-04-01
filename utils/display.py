@@ -1,161 +1,130 @@
-import sys
-import os
-
-# Add the root directory of your project to sys.path
-current_directory = os.path.dirname(__file__)
-project_root = os.path.abspath(os.path.join(current_directory, '..'))
-
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 from matplotlib.collections import LineCollection
+from utils.icon import draw_icon
 
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'
 
-directoryName = project_root + "/figures/"
+directoryName = "./Figures/"
 # inferno, jet, viridis, magma, Blues
 
 
-def see_path_1(
-        lw, variables, colorarray, color='jet', name='Figure_1', 
-        shift=(0, 0), var_case=2, bar=False, save="no", displayedInfo=""
+def see_path(
+        vars_x, vars_y, vars_c, 
+        figsize=(10., 6.), var_case=2,
+        lws=1., colors=None, shifts=None, pad=None,
+        displayedInfo=None, icon_name=None, sim=None,
+        name='Figure_1', save=None, 
     ):
-    plt.style.use('dark_background')
-    colorarray = np.nan_to_num(colorarray)
 
-    if save == "save" or save == "erase":
-        fig = plt.figure(figsize=(16, 9))
-        infoPosition, infoHeight, infoSize = 0.875, 0.25, 13
-    else:
-        fig = plt.figure(figsize=(16 * 0.65, 9 * 0.65))
-        infoPosition, infoHeight, infoSize = 0.875, 0.15, 11
-    fig.canvas.set_window_title(name)
+    n_plots = len(vars_x)
+
+    if isinstance(vars_x, np.ndarray):
+        vars_x = [vars_x]
     
-    L_X = np.nanmax(variables[0]) - np.nanmin(variables[0])
-    L_Y = np.nanmax(variables[1]) - np.nanmin(variables[1])
-    L_V = np.nanmax(colorarray) - np.nanmin(colorarray)
+    if isinstance(vars_y, np.ndarray):
+        vars_y = [vars_y]
+
+    if isinstance(vars_c, np.ndarray):
+        vars_c = [vars_c]
+
+    if shifts is None:
+        shifts = [(0, 0)] * n_plots
+    elif isinstance(shifts, tuple):
+        shifts = [shifts] * n_plots
+
+    if colors is None:
+        colors = ['inferno'] * n_plots
+    elif isinstance(colors, str):
+        colors = [colors] * n_plots
+
+    if isinstance(lws, float):
+        lws = [lws] * n_plots
+
+    # w = sqrt(NP dx / dy)
+    # h = sqrt(NP dy / dx)
+
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    infoPosition, infoHeight, infoSize = 0.975, 0.5, 11
+    fig.canvas.set_window_title(name)
+
+    x_min, x_max, y_min, y_max = np.inf, -np.inf, np.inf, -np.inf
+    for var_x, var_y, var_c in zip(vars_x, vars_y, vars_c):
+        var_c[:] = np.nan_to_num(var_c)
+        x_min, x_max = min(x_min, np.nanmin(var_x)), max(x_max, np.nanmax(var_x))
+        y_min, y_max = min(y_min, np.nanmin(var_y)), max(y_max, np.nanmax(var_y))
+    L_X, L_Y = x_max - x_min, y_max - y_min
+
+    pad_x1, pad_x2, pad_y1, pad_y2 = None, None, None, None
     if var_case == 1:
-        x_m, y_m = np.nanmin(variables[0]) - 0.25 * L_X, np.nanmin(variables[1]) - 0.1 * L_Y
-        x_M, y_M = np.nanmax(variables[0]) + 0.25 * L_X, np.nanmax(variables[1]) + 0.1 * L_Y
-        ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect='equal')
+        pad_x, pad_y = 0.25, 0.1
+        ax.set_aspect('equal', "datalim")
     elif var_case == 2:
-        x_m, y_m = np.nanmin(variables[0]) - 0.50 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
-        x_M, y_M = np.nanmax(variables[0]) + 0.50 * L_X, np.nanmax(variables[1]) + 0.15 * L_Y
-        ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M))
+        pad_x, pad_y = 0.15, 0.15
     elif var_case == 3:
-        x_m, y_m = np.nanmin(variables[0]) - 0.1 * L_X, np.nanmin(variables[1]) - 0.15 * L_Y
-        x_M, y_M = np.nanmax(variables[0]) + 0.1 * L_X, np.nanmax(variables[1]) + 0.6 * L_Y
-        ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M))
-        fig.set_size_inches(6, 6 * 9 / 5)
-    elif var_case == 4:
-        ax = fig.add_subplot(111, xlim=(-30, 30), ylim=(-4, 4))
-    else:
-        print("Choose a var_case <= 4 !!!")
-        return
+        pad_x1, pad_x2, pad_y1, pad_y2 = 0.1, 0.1, 0.15, 0.6
+    
+    if pad is not None:
+        if len(pad) == 2:
+            pad_x, pad_y = pad
+        elif len(pad) == 4:
+            pad_x1, pad_x2, pad_y1, pad_y2 = pad
+        
+    if pad_x1 is None:
+        pad_x1, pad_x2, pad_y1, pad_y2 = pad_x, pad_x, pad_y, pad_y
+        
+    x_m, y_m = x_min - pad_x1 * L_X, y_min - pad_y1 * L_Y
+    x_M, y_M = x_max + pad_x2 * L_X, y_max + pad_y2 * L_Y
+    ax.set_xlim(x_m, x_M)
+    ax.set_ylim(y_m, y_M)
+    # print(x_min, x_max, y_min, y_max)
+    # print(x_m, x_M, y_m, y_M)
 
-    cmap = plt.get_cmap(color)
-    norm = plt.Normalize(colorarray.min() - L_V * shift[0], colorarray.max() + L_V * shift[1])
+    for var_x, var_y, var_c, lw, c, shift in zip(vars_x, vars_y, vars_c, lws, colors, shifts):
+        cmap = plt.get_cmap(c)
+        delta_c = np.nanmax(var_c) - np.nanmin(var_c)
+        norm = plt.Normalize(var_c.min() - delta_c * shift[0], var_c.max() + delta_c * shift[1])
+        points = np.array(np.array([var_x, var_y])).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
+        line.set_array(var_c)
+        ax.add_collection(line)
 
-    points = np.array(variables).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
-    line.set_array(colorarray)
-    ax.add_collection(line)
+    plt.axis('off')
+    plt.subplots_adjust(left=0.00, right=1.00, bottom=0.00, top=1.00, wspace=None, hspace=None)
 
-    if bar:
-        cbar = fig.colorbar(line)
-        cbar.ax.set_ylabel('vitesse du pendule [m/s]')
-        plt.subplots_adjust(left=0.15, right=0.95, bottom=0.08, top=0.92, wspace=None, hspace=None)
-        ax.grid(ls=":")
-    else:
-        plt.axis('off')
-        plt.subplots_adjust(left=0.00, right=1.00, bottom=0.00, top=1.00, wspace=None, hspace=None)
-
-    if displayedInfo != "":
-        textbox = ax.text(infoPosition, infoHeight, "\n".join(displayedInfo), weight="light",
-                          transform=ax.transAxes, fontdict={'family': 'monospace', 'size': infoSize})
+    if displayedInfo is not None:
+        textbox = ax.text(
+            infoPosition, infoHeight, "\n".join(displayedInfo), 
+            weight="light", va='center', ha='right', transform=ax.transAxes, 
+            fontdict={'family': 'monospace', 'size': infoSize}
+        )
         textbox.set_bbox(dict(facecolor='white', edgecolor=None, alpha=0.25))
 
-    if save == "save" or save == "erase":  # or text=='yes':
-        number = 0
-        for filename in os.listdir(directoryName):
-            if filename.startswith('Figure') and int(filename[7:len(filename) - 4]) > number:
-                number = int(filename[7:len(filename) - 4])
-        path = directoryName + 'Figure_{}'.format(number + int(save == "save")) + ".png"
-        print('number = {}'.format(number))
-        plt.savefig(path, bbox_inches="tight")
+    if icon_name is not None and sim is not None:
+        draw_icon(ax, icon_name, sim, 0.20, 0.20, 0.04)
+
+    # if save == "save" or save == "erase":
+    #     new_number = 0
+    #     for filename in os.listdir(directoryName):
+    #         if not filename.startswith('figure'):
+    #             continue
+    #         current_nb = int(filename[7:len(filename) - 4])
+    #         if current_nb > new_number:
+    #             new_number = current_nb
+    #     path = directoryName + 'figure_{}'.format(new_number + int(save == "save")) + ".png"
+    #     print(f'number = {new_number}')
+
+    if save is not None and save != "no" and save != "":
+        path = directoryName + save
+        print("saved at ", path)
+        plt.savefig(path, transparent=False)
         plt.close(fig)
 
     plt.show()
     return
-
-
-def see_path(
-        lw, variables, colorarrays, colorList=('Inferno',),
-        shifts=None, var_case=1, save="no", displayedInfo=""
-    ):
-    if shifts is None:
-        shifts = [(0, 0), (0, 0)]
-    n = len(variables)
-    if len(colorList) != n:
-        colorList = colorList[0] * n
-
-    plt.style.use('dark_background')
-    if save == "save" or save == "erase":
-        fig = plt.figure(figsize=(16, 9))
-        infoHeight, infoSize = 0.3, 13
-    else:
-        fig = plt.figure(figsize=(16 * 0.65, 9 * 0.65))
-        infoHeight, infoSize = 0.25, 11
-
-    x_min, x_max, y_min, y_max = float('inf'), -float('inf'), float('inf'), -float('inf')
-    for x, y in variables:
-        x_min, y_min = min(x_min, np.nanmin(x)), min(y_min, np.nanmin(y))
-        x_max, y_max = max(x_max, np.nanmax(x)), max(y_max, np.nanmax(y))
-    L_X, L_Y = x_max - x_min, y_max - y_min
-
-    if var_case == 1:
-        x_m, y_m = x_min - 0.2 * L_X, y_min - 0.2 * L_Y
-        x_M, y_M = x_max + 0.2 * L_X, y_max + 0.2 * L_Y
-        aspect = 'equal'
-        infoPosition = 1.025
-    else:
-        x_m, y_m = x_min - 0.65 * L_X, y_min - 0.1 * L_Y
-        x_M, y_M = x_max + 0.65 * L_X, y_max + 0.1 * L_Y
-        aspect = 'auto'
-        infoPosition = 0.875
-
-    ax = fig.add_subplot(111, xlim=(x_m, x_M), ylim=(y_m, y_M), aspect=aspect)
-
-    for variable, colorarray, color, shift in zip(variables, colorarrays, colorList, shifts):
-        cmap, L_V = plt.get_cmap(color), np.nanmax(colorarray) - np.nanmin(colorarray)
-        # norm = plt.Normalize(0, colorarray.max() * 1.05)
-        norm = plt.Normalize(colorarray.min() - L_V * shift[0], colorarray.max() + L_V * shift[1])
-
-        points = np.array(variable).T.reshape(-1, 1, 2)
-        segments = np.concatenate([points[:-1], points[1:]], axis=1)
-        line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
-        line.set_array(colorarray)
-        ax.add_collection(line)
-
-    plt.axis('off')
-    plt.subplots_adjust(left=0.05, right=1.00, bottom=0.05, top=0.95, wspace=None, hspace=None)
-
-    if displayedInfo != "":
-        textbox = ax.text(infoPosition, infoHeight, "\n".join(displayedInfo), weight="light",
-                          transform=ax.transAxes, fontdict={'family': 'monospace', 'size': infoSize})
-        textbox.set_bbox(dict(facecolor='white', edgecolor=None, alpha=0.25))
-
-    if save == "save" or save == "erase":  # or text=='yes':
-        number = 0
-        for filename in os.listdir(directoryName):
-            if filename.startswith('Figure') and int(filename[7:len(filename) - 4]) > number:
-                number = int(filename[7:len(filename) - 4])
-
-        path = directoryName + 'Figure_{}'.format(number + int(save == "save"))
-        print('number = {}'.format(number))
-        plt.savefig(path, bbox_inches="tight")  # , dpi=500, transparent=True)
-
-    plt.show()

@@ -1,6 +1,6 @@
 import physicsim.double_disk as db_disk
 import numpy as np
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 from physicsim.simulation import countDigits
 
 def display(sim):
@@ -32,7 +32,7 @@ def display(sim):
         r"$\dot x$ = {:>{width}.{dcm}f} $\rm m/s$".format(sim.dx, width=fmt2, dcm=dcm2),
     ]
 
-    see_path_1(2, np.array([th, dx]), dx, var_case=2, bar=False, save=False)
+    see_path(th, dx, dx, var_case=2, save="", displayedInfo=parameters)
     return
 
 

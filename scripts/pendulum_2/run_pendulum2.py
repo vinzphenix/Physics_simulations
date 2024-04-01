@@ -1,5 +1,5 @@
 import physicsim.pendulum_2 as db_pendulum
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 import numpy as np
 from numpy import pi, sqrt
 
@@ -207,26 +207,24 @@ def display(sim, wrap=False):
         t, series, kinematics = sim.full_t, sim.full_series, sim.full_kinematics
 
     phi1, om1, phi2, om2 = series
-    x1, y1, v1, x2, y2, v2, ac2, vx2, vy2, acx2, acy2 = kinematics
+    x1, y1, v1, x2, y2, v2, ac2, vx2, vy2, acx2, acy2, T1, T2 = kinematics
 
     parameters = sim.get_parameters()
 
     parameters[0] = r"Axe x : $x_2$"
     parameters[1] = r"Axe y : $y_2$"
     parameters[2] = r"Axe c : $v_2$"
-    # see_path_1(1, np.array([x2, y2]), ac2, color='viridis', var_case=1,  shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1., np.array([phi2, om2]), v1, color='inferno', shift=(0., -0.), var_case=2, save="no", displayedInfo=parameters, name='1')
+    # see_path(x2, y2, v2, colors='inferno', var_case=1, save="no", displayedInfo=parameters, name='1')
+    # see_path(phi2, om2, v1, colors='inferno', var_case=2, save="no", displayedInfo=parameters, name='2')
     
-    parameters[0] = r"Axe x : $\varphi_1 $  -  $\varphi_2$"
-    parameters[1] = r"Axe y : $\omega_1$  -  $\omega_2$"
-    parameters[2] = r"Axe c : $\varphi_2$  -  $\varphi_1$"
-    # see_path(1, [np.array([phi1, om1]), np.array([phi2, om2])],
-    #         [v1*v2, v1*v2],
-    #         #["YlOrRd", "YlGnBu"],
-    #         ["inferno", "inferno"],
-    #         [(-0., 0.), (-0., 0.)],
-    #         var_case=2, save="no", displayedInfo=parameters
-    # ) 
+    parameters[0] = r"Axe x : $\varphi_1$ - $\varphi_2$"
+    parameters[1] = r"Axe y : $\omega_1$ - $\omega_2$"
+    parameters[2] = r"Axe c : $\varphi_2$ - $\varphi_1$"
+    see_path([phi1, phi2], [om1, om2], [v1*v2, v1*v2],
+            colors=["YlOrRd", "YlGnBu"],
+            # colors=["inferno", "inferno"],
+            var_case=2, save="no", displayedInfo=parameters
+    ) 
     return
 
 if __name__ == "__main__":
@@ -240,7 +238,7 @@ if __name__ == "__main__":
     }
 
     setup = {
-        't_sim':50.0, 'fps': 30, 'slowdown': 1.0, 'oversample': 10
+        't_sim':50.0, 'fps': 30, 'slowdown': 0.3, 'oversample': 10
     }
 
     params, initials = load_configuration(26)

@@ -1,6 +1,6 @@
 import physicsim.pendulum_elastic as el_pendulum
 import numpy as np
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 from physicsim.simulation import countDigits
 
 
@@ -55,17 +55,8 @@ def display(sim):
     parameters[1] = r"Axe y : $y$"
     parameters[2] = r"Axe c : $acc$"
 
-    see_path_1(1., np.array([x, y]), -acc, color='inferno', var_case=1, name='0', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, om]), speed, color='inferno', var_case=2, name='1', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, r]), speed, color='viridis', var_case=2, name='2', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, dr]), speed, color='viridis', var_case=2, name='3', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([om, r]), speed, color='viridis', var_case=2, name='4', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([om, dr]), speed, color='viridis', var_case=2, name='5', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([r, dr]), speed, color='viridis', var_case=2, name='6', shift=(0., 0.), save="no", displayedInfo=parameters)
-
-    # see_path_1(1, np.array([x, y]), hypot(vx, vy), 'inferno', shift=(0., 0.), var_case=1, save=False)
-    # see_path_1(1, np.array([x, y]), hypot(ddx, ddy), 'inferno_r', shift=(0.1, 0.1), var_case=1, save=False)
-    # see_path_1(1, np.array([th, om]), hypot(r, dr), 'inferno', var_case=2, save=False)
+    see_path(x, y, -acc, colors='inferno', var_case=1, name='0', save="no", displayedInfo=parameters)
+    see_path(th, om, speed, colors='inferno', var_case=2, name='1', save="no", displayedInfo=parameters)
     return
 
 

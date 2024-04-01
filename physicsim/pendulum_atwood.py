@@ -31,6 +31,8 @@ class AtwoodPendulum(Simulation):
 
         d = np.mean(r)
         L = max(r) + d * 1.2
+        self.d = d  # used for icon
+        self.L = L  # used for icon
 
         x1, y1 = -d * np.ones_like(r), r + d - L
         x2, y2 = r * sin(th), -r * cos(th)

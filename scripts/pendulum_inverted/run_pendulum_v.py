@@ -1,7 +1,7 @@
 import physicsim.pendulum_vertical as v_pendulum
 import numpy as np
 from physicsim.simulation import countDigits
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 from numpy import pi, sqrt
 
 
@@ -74,14 +74,8 @@ def display(sim):
     parameters[1] = r"Axe y : $y_p$"
     parameters[2] = r"Axe c : $v_p$"
 
-    see_path_1(1.5, np.array([xp, yp]), vp, color='jet', var_case=1, name='0', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([phi, om]), vp, color='jet', var_case=2, name='1', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([phi, x]), vp, color='viridis', var_case=2, name='2', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([phi, dx]), vp, color='viridis', var_case=2, name='3', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([om, x]), vp, color='viridis', var_case=2, name='4', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([om, dx]), vp, color='viridis', var_case=2, name='5', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([x, dx]), vp, color='viridis', var_case=2, name='6', shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1, np.array([om, np.cos(phi+pi/2)]), vp, color='inferno', var_case=2, name='7', shift=(0., 0.), save="no", displayedInfo=parameters)
+    see_path(xp, yp, vp, colors='jet', lws=1.5, var_case=1, name='0', save="no", displayedInfo=parameters)
+    see_path(phi, om, vp, colors='inferno', lws=1., var_case=2, name='1', save="no", displayedInfo=parameters)
     return
 
 

@@ -1,6 +1,6 @@
 import physicsim.pendulum_L as pendulum_L
 from physicsim.simulation import countDigits
-from utils.display import see_path_1, see_path
+from utils.display import see_path
 import numpy as np
 
 def display(sim):
@@ -28,33 +28,16 @@ def display(sim):
     parameters[1] = r"Axe y : $y_p$"
     parameters[2] = r"Axe c : $v_p$"
 
-    see_path_1(1, np.array([th, phi1]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, phi2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, om]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, om1]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([th, om2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi1, phi2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi1, om]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi1, om1]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi1, om2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi2, om]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi2, om1]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([phi2, om2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([om, om1]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([om, om2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    # see_path_1(1, np.array([om1, om2]), np.hypot(v2x, v1y), color='jet', shift=(0., 0.), save="no", displayedInfo=parameters)
-    #
-    # see_path_1(1, np.array([om1, om2]), np.hypot(v2x, v1y), 'magma', var_case=2, save=False)
-    # see_path_1(1, np.array([phi1, om1 * phi2]), np.hypot(v2x, v1y), 'inferno', var_case=2, save=False)
-    # see_path(1, [np.array([phi2, sin(om2)]), np.array([phi1, sin(om1)])], [np.hypot(v2x, v2y), np.hypot(vx, vy)],
-    #             ['inferno', 'viridis'], var_case=2, save=False)
-    #
-    # see_path(1, [np.array([phi1, phi2]), np.array([om1, om2])], [np.hypot(v1x, v1y), np.hypot(v2x, v2y)],
-    #             ['viridis', 'inferno_r'], var_case=2, save="no", displayedInfo=parameters)
+    see_path(
+        th, phi1, np.hypot(v2x, v1y), 
+        colors='jet', save="no", displayedInfo=parameters
+    )
 
-    see_path(1, [np.array([th, om]), np.array([phi1, om1]), np.array([phi2, om2])],
-                [np.hypot(vx, vy), np.hypot(v1x, v1y), np.hypot(v2x, v2y)],
-                ('viridis', 'inferno_r', 'jet'), var_case=2, save=False)
+    see_path(
+        [th, phi1, phi2], [om, om1, om2], 
+        [np.hypot(vx, vy), np.hypot(v1x, v1y), np.hypot(v2x, v2y)],
+        colors=['viridis', 'inferno_r', 'jet'], var_case=2, save=False
+    )
     return
 
 if __name__ == "__main__":
