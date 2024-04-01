@@ -18,15 +18,6 @@ directoryName = project_root + "/figures/"
 # inferno, jet, viridis, magma, Blues
 
 
-def countDigits(a):
-    if a < 0.:
-        return max(2, 2 + int(np.log10(np.abs(a))))
-    elif a > 0.:
-        return max(1, 1 + int(np.log10(np.abs(a))))
-    else:
-        return 1
-
-
 def see_path_1(
         lw, variables, colorarray, color='jet', name='Figure_1', 
         shift=(0, 0), var_case=2, bar=False, save="no", displayedInfo=""

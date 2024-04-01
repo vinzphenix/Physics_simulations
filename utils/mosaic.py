@@ -1,23 +1,21 @@
-import sys
-import os
-current_directory = os.path.dirname(__file__)
-project_root = os.path.abspath(os.path.join(current_directory, '..'))
-sys.path.append(project_root)
-
 import matplotlib.pyplot as plt
 import numpy as np
-from atwood.atwood_pendulum import Atwood_Simulation, atwood_ode, atwood_kinematics
-from cylinder_slide.falling_cylinder import Cylinder_Simulation, cylinder_ode, cylinder_kinematics  # not done yet
-from pendulum_2.double_pendulum import ...
-from pendulum_2.double_pendulum import ...
-from pendulum_3.triple_pendulum import TriplePendulum, triple_pendulum_ode, triple_pendulum_kinematics
+from physicsim.pendulum_atwood import AtwoodPendulum
+from physicsim.cylinder_slide import Cylinder
+from physicsim.pendulum_driven import DrivenPendulum
+from physicsim.pendulum_2 import DoublePendulum
+from physicsim.pendulum_3 import TriplePendulum
+from physicsim.pendulum_elastic import PendulumElastic
+from physicsim.pendulum_vertical import VerticalPendulum
+from physicsim.pendulum_horiztontal import HorizontalPendulum
 
+from scripts.atwood.run_atwood import load_configuration as atwood_config
+from scripts.cylinder_slide.run_cylinder import load_configuration as cylinder_config
+from scripts.pendulum_driven.run_pendulum_driven import load_configuration as driven_config
+from scripts.pendulum_2.run_pendulum2 import load_configuration as double_config
+from scripts.pendulum_3.run_pendulum3 import load_configuration as triple_config
+from scripts.pendulum_elastic.run_pendulum_elastic import load_configuration as elastic_config
+from scripts.pendulum_inverted.run_pendulum_v import load_configuration as vertical_config
+from scripts.pendulum_inverted.run_pendulum_h import load_configuration as horizontal_config
 
-
-# Draw
-setup = {"t_sim": tsim, "fps": 30., "slowdown": 1., "oversample": 15}
-simulation = Atwood_Simulation(params, initial, setup)
-time_series = atwood_ode(simulation)
-x1, y1, x2, y2, vx, vy, v, ddr, dom, acx, acy, a = atwood_kinematics(simulation, time_series)
-see_path(1., [array([x2, y2]), array([2*x2, 2*y2])], [v, v], ["Blues", "viridis"], var_case=2, save="no")
-
+from utils import icon

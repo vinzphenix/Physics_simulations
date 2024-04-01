@@ -14,7 +14,7 @@ def runge(dt, U0, nSteps):
         th1 = phi1_0 + w * time
         th2, dth2 = u
 
-        f1 = - w * w * sin(th2 - th1) / l - sin(th2) / l
+        f1 = l * w * w * sin(th1 - th2) - sin(th2)
 
         return array([dth2, f1])
 
@@ -109,8 +109,8 @@ def on_touch(event, list_U0):
 
 
 if __name__ == "__main__":
-    l = 4.2
-    phi1_0, w = 0.0, 1.0 * 1./l
+    l = 2.
+    phi1_0, w = 0.0, 0.5 * 1. / l
 
     angle = 0.0 * pi
 

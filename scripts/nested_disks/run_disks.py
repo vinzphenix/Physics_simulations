@@ -1,6 +1,7 @@
 import physicsim.double_disk as db_disk
-from utils.display import countDigits, see_path_1, see_path
 import numpy as np
+from utils.display import see_path_1, see_path
+from physicsim.simulation import countDigits
 
 def display(sim):
     

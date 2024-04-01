@@ -391,8 +391,8 @@ fig, ax = plt.subplots(1, 1, figsize=(10., 10.), constrained_layout=False)
 fig.tight_layout()
 ax.plot([-1., 1000.], [0., 3.], '-o')
 
-# info = {'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3., 'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
-# draw_icon(ax, "double pendulum", info, 0.50, 0.25, 0.04)
+info = {'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3., 'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
+draw_icon(ax, "double pendulum", info, 0.50, 0.25, 0.04)
 
 # info = {'l1': 1.0, 'l2': 2.0, 'm1': 2.0, 'm2': 3., 'phi1': 1, 'phi2': 1-pi/2, 'om1': 2.,'om2': 3.}
 # draw_icon(ax, "driven pendulum", info, 0.50, 0.25, 0.04)

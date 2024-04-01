@@ -1,7 +1,5 @@
-import physicsim.foucault_pendulum as foucault
-from utils.display import countDigits, see_path_1, see_path
+import physicsim.pendulum_foucault as foucault
 import numpy as np
-
 
 if __name__ == "__main__":
 

@@ -120,9 +120,9 @@ if __name__ == "__main__":
     # initial, params = {"x": 1., "v": 0.}, {"eta": 9.81, "mode": 1., "eps": 1., "sigma": 1.}
     # ddy + eta dy + (+/- 1 + eps y^2) * y = cos(sigma t)  # NON dimensional form
 
-    initial, params = {"x": 1., "v": 0.}, {"kappa": 0.3, "beta": -1., "alpha": 1., "gamma": 0.37, "omega": 1.25}
+    # initial, params = {"x": 1., "v": 0.}, {"kappa": 0.3, "beta": -1., "alpha": 1., "gamma": 0.37, "omega": 1.25}
     # initial, params = {"x": 1., "v": 0.}, {"kappa": 0.3, "beta": -1., "alpha": 1., "gamma": 0.4, "omega": 0.5}
-    # initial, params = {"x": 1., "v": 0.}, {"kappa": 0.02, "beta": 1., "alpha": 5., "gamma": 8., "omega": 0.5}
+    initial, params = {"x": 1., "v": 0.}, {"kappa": 0.02, "beta": 1., "alpha": 5., "gamma": 8., "omega": 0.5}
 
     setup = {"n_cycles": 100, "fps": 20., "oversample": 5, "slowdown": 0.2, "end_transient": 0.10}
 

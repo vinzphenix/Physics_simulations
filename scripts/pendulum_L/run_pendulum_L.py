@@ -1,5 +1,6 @@
 import physicsim.pendulum_L as pendulum_L
-from utils.display import countDigits, see_path_1, see_path
+from physicsim.simulation import countDigits
+from utils.display import see_path_1, see_path
 import numpy as np
 
 def display(sim):

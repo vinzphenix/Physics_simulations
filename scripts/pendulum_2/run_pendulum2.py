@@ -1,5 +1,5 @@
-import physicsim.double_pendulum as db_pendulum
-from utils.display import countDigits, see_path_1, see_path
+import physicsim.pendulum_2 as db_pendulum
+from utils.display import see_path_1, see_path
 import numpy as np
 from numpy import pi, sqrt
 
@@ -202,41 +202,20 @@ def load_configuration(i):
 
 def display(sim, wrap=False):
     if wrap:
-        time_series = sim.get_cut_series()
+        t, series, kinematics = sim.get_cut_series(0, 2)  # phi1, phi2
     else:
-        time_series = np.r_[sim.full_t.reshape(1, -1), sim.full_series]
+        t, series, kinematics = sim.full_t, sim.full_series, sim.full_kinematics
 
-    t, phi1, om1, phi2, om2 = time_series
-    x1, y1, v1, x2, y2, v2, ac2, vx2, vy2, acx2, acy2 = sim.full_kinematics
+    phi1, om1, phi2, om2 = series
+    x1, y1, v1, x2, y2, v2, ac2, vx2, vy2, acx2, acy2 = kinematics
 
-    params1 = np.array([sim.l1, sim.l2, sim.m1, sim.m2])
-    params2 = np.array([sim.phi1d, sim.phi2d, sim.om1, sim.om2])
-    dcm1, dcm2 = 3, 4
-    fmt1, fmt2 = countDigits(np.amax(params1)) + 1 + dcm1, 1 + 1 + dcm2
-    for val in params2:
-        fmt2 = max(fmt2, countDigits(val) + 1 + dcm2)
-
-    parameters = [
-        r"Axe x : $x_2$",
-        r"Axe y : $y_2$",
-        r"Axe c : $v_2$",
-        "", r"$\Delta t$ = {:.2f} $\rm s$".format(t[-1]), "",
-        r"$l_1 \;\:\,$ = {:>{width}.{dcm}f} $\rm m$".format(sim.l1, width=fmt1, dcm=dcm1),
-        r"$l_2 \;\:\,$ = {:>{width}.{dcm}f} $\rm m$".format(sim.l2, width=fmt1, dcm=dcm1),
-        r"$m_1$ = {:>{width}.{dcm}f} $\rm kg$".format(sim.m1, width=fmt1, dcm=dcm1),
-        r"$m_2$ = {:>{width}.{dcm}f} $\rm kg$".format(sim.m2, width=fmt1, dcm=dcm1),
-        "", r"$g$  = {:>5.2f} $\rm m/s^2$".format(sim.g), "",
-        r"$\varphi_1$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.phi1d, width=fmt2, dcm=dcm2),
-        r"$\varphi_2$ = {:>{width}.{dcm}f} $\rm deg$".format(sim.phi2d, width=fmt2, dcm=dcm2),
-        r"$\omega_1$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om1, width=fmt2, dcm=dcm2),
-        r"$\omega_2$ = {:>{width}.{dcm}f} $\rm rad/s$".format(sim.om2, width=fmt2, dcm=dcm2),
-    ]
+    parameters = sim.get_parameters()
 
     parameters[0] = r"Axe x : $x_2$"
     parameters[1] = r"Axe y : $y_2$"
     parameters[2] = r"Axe c : $v_2$"
     # see_path_1(1, np.array([x2, y2]), ac2, color='viridis', var_case=1,  shift=(0., 0.), save="no", displayedInfo=parameters)
-    see_path_1(1., np.array([phi1, phi2]), v1, color='inferno', shift=(0., -0.), var_case=2, save="no", displayedInfo=parameters, name='1')
+    see_path_1(1., np.array([phi2, om2]), v1, color='inferno', shift=(0., -0.), var_case=2, save="no", displayedInfo=parameters, name='1')
     
     parameters[0] = r"Axe x : $\varphi_1 $  -  $\varphi_2$"
     parameters[1] = r"Axe y : $\omega_1$  -  $\omega_2$"
@@ -261,13 +240,13 @@ if __name__ == "__main__":
     }
 
     setup = {
-        't_sim':250.0, 'fps': 30, 'slowdown': .15, 'oversample': 10
+        't_sim':50.0, 'fps': 30, 'slowdown': 1.0, 'oversample': 10
     }
 
-    params, initials = load_configuration(55)
+    params, initials = load_configuration(26)
 
     sim = db_pendulum.DoublePendulum(setup, params, initials)
     sim.solve_ode()
-    sim.animate(figsize=(13., 6.), show_v=False, show_a=False, wrap=False, save="no")
+    sim.animate(figsize=(13., 6.), show_v=False, show_a=False, wrap=True, save="no")
 
-    # display(sim, wrap=False)
+    # display(sim, wrap=True)

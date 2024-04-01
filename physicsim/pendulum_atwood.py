@@ -1,6 +1,6 @@
 from .simulation import *
 
-class Atwood_Pendulum(Simulation):
+class AtwoodPendulum(Simulation):
 
     REQUIRED_PARAMS = ["g", "M", "m"]
     REQUIRED_INITIALS = ["r", "dr", "th", "om"]
@@ -109,7 +109,7 @@ class Atwood_Pendulum(Simulation):
             return line, line2, phase1, phase2, time_text, sector
 
         def update(i):
-            start = max(0, i - int(self.slowdown * self.fps * 100.))  # display history of last ... seconds
+            start = max(0, i - int(self.slowdown * self.fps * 50.))  # display history of last ... seconds
             thisx = [x2[i], 0, x1[i], x1[i]]
             thisy = [y2[i], 0, 0, y1[i]]
 
@@ -144,3 +144,29 @@ class Atwood_Pendulum(Simulation):
             fig.savefig("./atwood.svg", format="svg", bbox_inches="tight")
         else:
             plt.show()
+
+    def get_parameters(self):
+        params = np.array([self.r, self.dr, self.thd, self.om])
+        dcm1, dcm2 = 5, 3
+        fmt2 = 1 + 1 + dcm2
+        for val in params:
+            fmt2 = max(fmt2, countDigits(val) + 1 + dcm2)
+
+        parameters = np.array([
+            r"Axe x : $x_2$",
+            r"Axe y : $y_2$",
+            r"Axe c : $v_2$", 
+            "",
+            r"$\Delta t$ = {:.2f} $\rm s$".format(self.t_sim), 
+            "",  # 5
+            r"$\mu$ = {:.{dcm}f}".format(self.M / self.m, dcm=dcm1),
+            "", 
+            r"$g$ = {:.2f} $\rm m/s^2$".format(self.g), 
+            "",  # 9
+            r"$r \;\,\,$ = {:>{width}.{dcm}f} $\rm m$".format(self.r, width=fmt2, dcm=dcm2),
+            r"$dr$ = {:>{width}.{dcm}f} $\rm m/s$".format(self.dr, width=fmt2, dcm=dcm2),
+            r"$\vartheta \;\,$ = {:>{width}.{dcm}f} $\rm deg$".format(self.thd, width=fmt2, dcm=dcm2),
+            r"$\omega \;\,$ = {:>{width}.{dcm}f} $\rm rad/s$".format(self.om, width=fmt2, dcm=dcm2)
+        ])
+        
+        return parameters

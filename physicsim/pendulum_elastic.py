@@ -161,3 +161,33 @@ class PendulumElastic(Simulation):
             fig.savefig("./elastic_pendulum.svg", format="svg", bbox_inches="tight")
         else:
             plt.show()
+
+    def get_parameters(self):
+        params1 = np.array([self.l, self.m, self.k])
+        params2 = np.array([self.thd, self.om, self.r, self.dr])
+
+        dcm1, dcm2 = 3, 3
+        fmt1, fmt2 = countDigits(np.amax(params1)) + 1 + dcm1, 1 + 1 + dcm2
+        for val in params2:
+            fmt2 = max(fmt2, countDigits(val) + 1 + dcm2)
+
+        parameters = np.array([
+            r"Axe x : $x$",
+            r"Axe y : $y$",
+            r"Axe c : $speed$",
+            "", 
+            r"$\Delta t$ = {:.2f} $\rm s$".format(self.t_sim), 
+            "",  # 5
+            r"$l\;\;$ = {:>{width}.{dcm}f} $\rm m$".format(self.l, width=fmt1, dcm=dcm1),
+            r"$m$ = {:>{width}.{dcm}f} $\rm kg$".format(self.m, width=fmt1, dcm=dcm1),
+            r"$k\:\:$ = {:>{width}.{dcm}f} $\rm N/m$".format(self.k, width=fmt1, dcm=dcm1),
+            "", 
+            r"$g\,$ = {:.2f} $\rm m/s^2$".format(self.g), 
+            "",
+            r"$\vartheta $ = {:>{width}.{dcm}f} $\rm deg$".format(self.thd, width=fmt2, dcm=dcm2),
+            r"$\omega$ = {:>{width}.{dcm}f} $\rm deg/s$".format(self.omd, width=fmt2, dcm=dcm2),
+            r"$r\,$ = {:>{width}.{dcm}f} $\rm m$".format(self.r, width=fmt2, dcm=dcm2),
+            r"$\dot r\,$ = {:>{width}.{dcm}f} $\rm m/s$".format(self.dr, width=fmt2, dcm=dcm2)
+        ])
+
+        return parameters

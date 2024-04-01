@@ -1,5 +1,6 @@
 import physicsim.cylinder_slide as fcyl
-from utils.display import countDigits, see_path_1, see_path
+from utils.display import see_path_1, see_path
+from physicsim.simulation import countDigits
 import numpy as np
 
 def display(sim):

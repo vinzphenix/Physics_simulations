@@ -75,7 +75,7 @@ class Simulation:
         return
 
 
-    def solve_ode(self, atol=1e-8, rtol=1e-8):
+    def solve_ode(self, atol=1e-8, rtol=1e-8, verbose=True):
 
         start = perf_counter()
         sol = odeint(self.dynamics, self.U0, self.full_t, tfirst=True, atol=atol, rtol=rtol).T
@@ -85,7 +85,8 @@ class Simulation:
         #     atol=atol, rtol=rtol
         # ).y
         end = perf_counter()
-        print(f"\tElapsed time : {end-start:.3f} seconds")
+        if verbose:
+            print(f"\tElapsed time : {end-start:.3f} seconds")
         
         self.full_series = sol
         self.series = self.full_series[:, ::self.oversample]
@@ -94,3 +95,40 @@ class Simulation:
         self.kinematics = self.full_kinematics[:, ::self.oversample]
         
         return
+
+    def wrap_angles(self, *angles_idxs):
+        for idx in angles_idxs:
+            phi = self.full_series[idx]
+            phi[:] = np.remainder(phi[:] + np.pi, 2 * np.pi) - np.pi
+        return
+
+    def get_cut_series(self, *angles_idxs):
+        self.wrap_angles(*angles_idxs)
+        n2, n3 = self.full_series.shape[0], self.full_kinematics.shape[0]
+        all_series = np.c_[self.full_t, self.full_series.T, self.full_kinematics.T].T
+        new_series = [this_series.copy() for this_series in all_series]
+        # insert np.nan to break the line when the angle goes from -pi to pi
+        for idx in angles_idxs:
+            phi = new_series[1+idx]
+            jump_idxs = np.where(np.abs(np.diff(phi)) > 3)[0] + 1
+            if len(jump_idxs) == 0:
+                continue
+            # print(idx, jump_idxs)
+            for k in range(len(new_series)):
+                # print(k)
+                # print(new_series[k])
+                if k == idx+1:  # insert np.nan in the angle
+                    new_series[k] = np.insert(new_series[k], jump_idxs, np.nan)
+                else:  # insert the same value as before the jump
+                    new_series[k] = np.insert(new_series[k], jump_idxs, new_series[k][jump_idxs])
+                # print(new_series[k])
+        return new_series[0], new_series[1:1+n2], new_series[1+n2:]
+    
+
+def countDigits(a):
+    if a < 0.:
+        return max(2, 2 + int(np.log10(np.abs(a))))
+    elif a > 0.:
+        return max(1, 1 + int(np.log10(np.abs(a))))
+    else:
+        return 1

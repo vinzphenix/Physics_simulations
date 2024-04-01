@@ -2,116 +2,69 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
+import physicsim.pendulum_1 as pendulum_1
 
 from matplotlib.animation import FuncAnimation
-from numpy import sin, cos, radians, pi, amax, abs
+from numpy import sin, cos, pi
 from scipy.integrate import odeint
 from timeit import default_timer as timer
+from tqdm import tqdm
 
 matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['mathtext.rm'] = 'serif'
 
-########################################################################################################
 
-#####     ================      Paramètres  de la simulation      ================      ####
+def animate_pendulums(t, x, y, figsize=(8., 6.), save=''):
 
-g   = 9.81              # [m/s²]  -  accélaration de pesanteur
-l   = 0.50              # [m]     -  longueur petit pendule
-L   = 1.00              # [m]     -  longueur grand pendule
-n_p = 30                # [/]     -  nombre de pendules
-D   = 0.1              # [kg/s]  -  coefficient de frottement linéaire
-m   = 1                 # [kg]    -  masse pendule
+    n_pdl, nt = x.shape
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
 
-phi0 = 170.0             # [°]     -  angle 1er pendule
-om0  = 0.00             # [rad/s] -  v angulaire 1er pendule en résonance
-
-Tend = 30                # [s]    -  fin de la simulation
-n = int(400 * Tend)
-fps = 20
-ratio = n // (int(Tend * fps))
-
-########################################################################################################
-
-#####     ================      Résolution de l'équation différentielle      ================      #####
-phi0 = radians(phi0)
-t = np.linspace(0, Tend, n)
-
-long, long2 = np.linspace(l, L, n_p), np.linspace(l, L, 2 * n_p)
-U0 = np.c_[np.linspace(phi0, phi0, n_p), np.linspace(om0, om0, n_p)]
-
-f = lambda u, _, li: np.array([u[1], - g / li * sin(u[0]) - D / m * u[1]])
-phi, om = np.zeros((n_p, n)), np.zeros((n_p, n))
-
-tic = timer()
-for i in range(n_p):
-    sol = odeint(f, U0[i], t, args=(long[i],))
-    phi[i], om[i] = sol[:, 0], sol[:, 1]
-
-print("      Elapsed time : %f seconds" % (timer() - tic))
-
-x = sin(phi) * long[:, None]
-y = -cos(phi) * long[:, None]
-
-y_max = amax(y) + 0.1 * amax(abs(y))
-
-
-########################################################################################################
-
-#####     ================      Animation du Système      ================      #####
-
-def see_animation(save):
-
-    #####     ================      Création de la figure      ================      #####
-
-    w, h = 8, 6
-    fig, ax = plt.subplots(1, 1, figsize=(w, h), constrained_layout=True)
-
-    if phi0 >= pi / 2:
-        ax.axis([-L * 1.1 * w / h, L * 1.1 * w / h, -L * 1.1, L * 1.1])
-        ax.set_aspect("equal")
-        sector = patches.Wedge((L, -L), L / 15, theta1=90, theta2=90, color='lightgrey')
-    elif phi0 < pi / 2:
-        ax.axis([-1.1 * L * sin(phi0) * w / h, 1.1 * L * sin(phi0) * w / h, -2.2 * L * sin(phi0), 0])
-        ax.set_aspect("equal")
-        sector = patches.Wedge((L * sin(phi0), -2 * L * sin(phi0)), L / 15, theta1=90, theta2=90, color='lightgrey')
+    x_min, x_max = np.min(x), np.max(x)
+    y_min, y_max = np.min(y), np.max(y)
+    dx, dy = x_max - x_min, y_max - y_min
+    sector = patches.Wedge((x_min, y_max), dx/20, theta1=90, theta2=90, color='lightgrey')
+    
+    x_min, x_max = x_min - 0.1 * dx, x_max + 0.1 * dx
+    y_min, y_max = y_min - 0.1 * dy, y_max + 0.1 * dy
+    tmp, = ax.plot([x_min, x_max], [y_min, y_max])
+    ax.set_aspect("equal", "datalim")
+    tmp.remove()
 
     ax.grid(ls=':')
-    # line, = ax.plot([], [], lw=2)
     time_template = r'$t = %.2f s$'
     time_text = ax.text(0.8, 0.93, '1', fontsize=15, wrap=True, transform=ax.transAxes)
 
     cmap = plt.get_cmap('jet')
     lines = []
+    markers = []
 
-    for index in range(n_p):
-        # = ax1.plot([], [], 'o-', lw=1, color=cmap((index + 1) / n_p))[0]
-        lines.append(ax.plot([], [], marker='o', ms=5, color=cmap((index + 1) / n_p))[0])
-
-    #####     ================      Animation      ================      #####
+    for index in range(n_pdl):
+        c = cmap((index + 1) / n_pdl)
+        lines.append(ax.plot([], [], '-', color=c, alpha=0.2)[0])
+        markers.append(ax.plot([], [], ls="", marker='.', ms=5, color=c)[0])
 
     def init():
-        for line in lines:
+        for line, marker in zip(lines, markers):
             line.set_data([], [])
+            marker.set_data([], [])
         time_text.set_text('')
         sector.set_theta1(90)
-        return tuple(lines) + (time_text, sector)
+        return tuple(lines) + tuple(markers) + (time_text, sector)
 
     def animate(idx):
-        idx *= ratio
-
-        for j, line in enumerate(lines):
-            # line.set_data([0, x[j][2 * j]], [0, y[j][2 * j]])
-            # line.set_data([x[idx][2 * j]], [y[idx][2 * j]])
-            line.set_data([x[j][idx]], [y[j][idx]])
-
-        time_text.set_text(time_template % (t[idx + ratio - 1]))
-        sector.set_theta1(90 - 360 * t[idx + ratio - 1] / Tend)
+        for j, (line, marker) in enumerate(zip(lines, markers)):
+            line.set_data([0., x[j, idx]], [0., y[j, idx]])
+            marker.set_data([x[j, idx]], [y[j, idx]])
+        time_text.set_text(time_template % (t[idx]))
+        sector.set_theta1(90 - 360 * t[idx] / t[-1])
         ax.add_patch(sector)
+        return tuple(lines) + tuple(markers) + (time_text, sector)
 
-        return tuple(lines) + (time_text, sector)
-
-    anim = FuncAnimation(fig, animate, n//ratio, init_func=init, interval=5, blit=True, repeat_delay=3000)
-    # plt.subplots_adjust(left=0.05, right=0.95, bottom=0.02, top=0.92, wspace=None, hspace=None)
+    anim = FuncAnimation(
+        fig, animate, nt, init_func=init, 
+        interval=5, blit=True, repeat_delay=3000
+    )
+    fig.tight_layout()
 
     if save == "save":
         anim.save('Pendule_multiple_1.html', fps=20)
@@ -119,4 +72,27 @@ def see_animation(save):
         plt.show()
 
 
-see_animation(save="")
+if __name__ == "__main__":
+
+    setup = {"t_sim": 60., "fps": 30, "slowdown": 4, "oversample": 10}
+    params = {"g": 9.81, "l": 0.5, "D": 0.01, "m": 1.}
+    initials = {"phi": np.radians(170.), "om": 0.}
+
+    sim = pendulum_1.Pendulum(setup, params, initials)
+
+    n_sim = 100
+    n_frames = sim.n_frames
+
+    l_range = np.linspace(0.5, 1.0, n_sim)
+    x = np.zeros((n_sim, 1+n_frames))
+    y = np.zeros((n_sim, 1+n_frames))
+
+    for i in tqdm(range(n_sim)):    
+        params['l'] = l_range[i]
+        sim = pendulum_1.Pendulum(setup, params, initials)
+        sim.solve_ode(verbose=False)
+        phi, om = sim.series
+        x[i, :] = +sim.l * sin(phi)
+        y[i, :] = -sim.l * (cos(phi))
+
+    animate_pendulums(sim.t, x, y)

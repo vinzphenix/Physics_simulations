@@ -1,6 +1,7 @@
-import physicsim.vertical_pendulum as v_pendulum
-from utils.display import countDigits, see_path_1, see_path
+import physicsim.pendulum_vertical as v_pendulum
 import numpy as np
+from physicsim.simulation import countDigits
+from utils.display import see_path_1, see_path
 from numpy import pi, sqrt
 
 

@@ -1,6 +1,7 @@
-import physicsim.elastic_pendulum as el_pendulum
-from utils.display import countDigits, see_path_1, see_path
+import physicsim.pendulum_elastic as el_pendulum
 import numpy as np
+from utils.display import see_path_1, see_path
+from physicsim.simulation import countDigits
 
 
 def load_configuration(i):
@@ -48,28 +49,8 @@ def display(sim):
     th, om, r, dr = sim.full_series
     x, y, vx, vy, speed, d2r, d2th, ddx, ddy, acc = sim.full_kinematics
 
-    params1 = np.array([sim.l, sim.m, sim.k])
-    params2 = np.array([sim.thd, sim.om, sim.r, sim.dr])
 
-    dcm1, dcm2 = 3, 3
-    fmt1, fmt2 = countDigits(np.amax(params1)) + 1 + dcm1, 1 + 1 + dcm2
-    for val in params2:
-        fmt2 = max(fmt2, countDigits(val) + 1 + dcm2)
-
-    parameters = [
-        r"Axe x : $x$",
-        r"Axe y : $y$",
-        r"Axe c : $speed$",
-        "", r"$\Delta t$ = {:.2f} $\rm s$".format(t[-1]), "",
-        r"$l\;\;$ = {:>{width}.{dcm}f} $\rm m$".format(sim.l, width=fmt1, dcm=dcm1),
-        r"$m$ = {:>{width}.{dcm}f} $\rm kg$".format(sim.m, width=fmt1, dcm=dcm1),
-        r"$k\:\:$ = {:>{width}.{dcm}f} $\rm N/m$".format(sim.k, width=fmt1, dcm=dcm1),
-        "", r"$g\,$ = {:.2f} $\rm m/s^2$".format(sim.g), "",
-        r"$\vartheta $ = {:>{width}.{dcm}f} $\rm deg$".format(sim.thd, width=fmt2, dcm=dcm2),
-        r"$\omega$ = {:>{width}.{dcm}f} $\rm deg/s$".format(sim.omd, width=fmt2, dcm=dcm2),
-        r"$r\,$ = {:>{width}.{dcm}f} $\rm m$".format(sim.r, width=fmt2, dcm=dcm2),
-        r"$\dot r\,$ = {:>{width}.{dcm}f} $\rm m/s$".format(sim.dr, width=fmt2, dcm=dcm2)
-    ]
+    parameters = sim.get_parameters()
     parameters[0] = r"Axe x : $x$"
     parameters[1] = r"Axe y : $y$"
     parameters[2] = r"Axe c : $acc$"
@@ -91,12 +72,12 @@ def display(sim):
 if __name__ == "__main__":
 
     params = {
-        "g": 9.81, "D": 0.1, 
+        "g": 9.81, "D": 1., 
         "l": 1., "m": 1., "k": 37.535
     }
 
     initials = {
-        "th": np.radians(10), "om": 0., 
+        "th": np.radians(10), "om": 2., 
         "r": 0.75, "dr": 0.
     }
 
