@@ -2,6 +2,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from utils.icon import get_aspect
 
 from matplotlib.collections import LineCollection
 from utils.icon import draw_icon
@@ -13,12 +14,54 @@ directoryName = "./Figures/"
 # inferno, jet, viridis, magma, Blues
 
 
+def get_axis_bounds(ax, data_bounds, pad_x, pad_y, equal):
+    """
+    Determines if the scaling is tight at the width percentage constraint,
+    or at the height percentage constraint. Returns the adequate scaling.
+    """
+    figW, figH = ax.get_figure().get_size_inches()  # total figure size
+    _, _, w, h = ax.get_position().bounds  # axis size on figure
+    disp_ratio = (figH * h) / (figW * w)  # ratio of display units
+    
+    xmin, xmax, ymin, ymax = data_bounds
+    xm, dx = 0.5*(xmin + xmax), xmax - xmin
+    ym, dy = 0.5*(ymin + ymax), ymax - ymin
+    pad_xl, pad_xr = pad_x
+    pad_yb, pad_yt = pad_y
+    
+    new_dx = dx * (1. + pad_xl + pad_xr)
+    new_dy = dy * (1. + pad_yb + pad_yt)
+
+    if equal:
+        # y_data thight --> x_axis extent
+        if new_dx < new_dy / disp_ratio:
+            xmin = xm - 0.5 * new_dy / disp_ratio
+            xmax = xm + 0.5 * new_dy / disp_ratio
+            ymin = ymin - pad_yb * dy
+            ymax = ymax + pad_yt * dy
+
+        # x_data thight --> y_axis extent
+        else:
+            xmin = xmin - pad_xl * dx
+            xmax = xmax + pad_xr * dx
+            ymin = ym - 0.5 * new_dx * disp_ratio
+            ymax = ym + 0.5 * new_dx * disp_ratio
+    
+    else:
+        xmin = xmin - pad_xl * dx
+        xmax = xmax + pad_xr * dx
+        ymin = ymin - pad_yb * dy
+        ymax = ymax + pad_yt * dy
+
+    return xmin, xmax, ymin, ymax
+
+
 def see_path(
         vars_x, vars_y, vars_c, 
         figsize=(10., 6.), var_case=2,
         lws=1., colors=None, shifts=None, pad=None,
         displayedInfo=None, icon_name=None, sim=None,
-        name='Figure_1', save=None, 
+        bg=None, name='Figure_1', save=None,
     ):
 
     n_plots = len(vars_x)
@@ -48,8 +91,9 @@ def see_path(
     # w = sqrt(NP dx / dy)
     # h = sqrt(NP dy / dx)
 
-    plt.style.use('dark_background')
+    # plt.style.use('dark_background')
     fig, ax = plt.subplots(1, 1, figsize=figsize)
+    # fig.set_facecolor("lightgrey")
     infoPosition, infoHeight, infoSize = 0.975, 0.5, 11
     fig.canvas.set_window_title(name)
 
@@ -63,27 +107,50 @@ def see_path(
     pad_x1, pad_x2, pad_y1, pad_y2 = None, None, None, None
     if var_case == 1:
         pad_x, pad_y = 0.25, 0.1
-        ax.set_aspect('equal', "datalim")
     elif var_case == 2:
         pad_x, pad_y = 0.15, 0.15
     elif var_case == 3:
         pad_x1, pad_x2, pad_y1, pad_y2 = 0.1, 0.1, 0.15, 0.6
     
+    # custom pad input
     if pad is not None:
         if len(pad) == 2:
             pad_x, pad_y = pad
         elif len(pad) == 4:
             pad_x1, pad_x2, pad_y1, pad_y2 = pad
-        
+    
+    # symmetric padding given --> create duplicates
     if pad_x1 is None:
         pad_x1, pad_x2, pad_y1, pad_y2 = pad_x, pad_x, pad_y, pad_y
         
     x_m, y_m = x_min - pad_x1 * L_X, y_min - pad_y1 * L_Y
     x_M, y_M = x_max + pad_x2 * L_X, y_max + pad_y2 * L_Y
-    ax.set_xlim(x_m, x_M)
-    ax.set_ylim(y_m, y_M)
-    # print(x_min, x_max, y_min, y_max)
-    # print(x_m, x_M, y_m, y_M)
+    axis_bounds = get_axis_bounds(
+        ax, 
+        [x_min, x_max, y_min, y_max],
+        (pad_x1, pad_x2),
+        (pad_y1, pad_y2),
+        var_case == 1
+    )
+    ax.axis(axis_bounds)
+
+    plt.axis('off')
+    plt.subplots_adjust(left=0.00, right=1.00, bottom=0.00, top=1.00, wspace=None, hspace=None)
+
+    # set background
+    if bg:
+        x_bg = np.linspace(0., 1., 100)
+        y_bg = np.linspace(0., 1., 100)
+        x_bg, y_bg = np.meshgrid(x_bg, y_bg)
+        u_bg = 0.5*(x_bg + y_bg) - 0.15 * (x_bg**2 + y_bg**2)
+        u_bg = (u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))
+        u_bg = u_bg[::1, ::1]
+        ax.imshow(
+            u_bg, cmap=plt.get_cmap("binary_r"), origin='lower', aspect='auto',
+            interpolation='bicubic', extent=axis_bounds, vmin=0.1, vmax=5.
+        )
+    else:
+        fig.set_facecolor("black")
 
     for var_x, var_y, var_c, lw, c, shift in zip(vars_x, vars_y, vars_c, lws, colors, shifts):
         cmap = plt.get_cmap(c)
@@ -94,9 +161,6 @@ def see_path(
         line = LineCollection(segments, cmap=cmap, norm=norm, lw=lw)
         line.set_array(var_c)
         ax.add_collection(line)
-
-    plt.axis('off')
-    plt.subplots_adjust(left=0.00, right=1.00, bottom=0.00, top=1.00, wspace=None, hspace=None)
 
     if displayedInfo is not None:
         textbox = ax.text(
