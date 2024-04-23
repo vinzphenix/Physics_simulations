@@ -10,8 +10,9 @@ from numpy import sin, cos, pi, arccos, sqrt, degrees, radians
 from time import perf_counter
 from tqdm import tqdm
 
-from pendulum_2.double_pendulum import dynamics, DoublePendulum, double_pendulum_ode, double_pendulum_kinematics, see_animation
-from utils.Fixed_Path import see_path_1
+from physicsim.pendulum_2 import DoublePendulum
+# , DoublePendulum, double_pendulum_ode, double_pendulum_kinematics, see_animation
+from utils.display import see_path
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 
@@ -19,6 +20,14 @@ ftSz1, ftSz2, ftSz3 = 18, 15, 13
 plt.rcParams["text.usetex"] = False
 plt.rcParams['font.family'] = 'serif'
 
+
+def dynamics(t, u, l, mu):
+    # dimentionless form of the equations of motion
+    th1, w1, th2, w2 = u[0], u[1], u[2], u[3]
+    Cos, Sin = cos(th1 - th2), sin(th1 - th2)
+    f1 = (mu * Cos * (sin(th2) - w1 * w1 * Sin) - l * mu * w2 * w2 * Sin - sin(th1)) / (1. - mu * Cos * Cos)
+    f2 = Sin * (cos(th1) + w1 * w1 + l * mu * w2 * w2 * Cos) / (l - l * mu * Cos * Cos)
+    return np.array([w1, f1, w2, f2])
 
 def jac(_, y_, l, mu):
     phi1, w1, phi2, w2 = y_
@@ -169,12 +178,12 @@ def on_click(event, list_U0, lines):
 
 def on_touch(event, list_U0, lines):
     def compute_sim(U0):
-        params = {'lambda': L, 'mu': MU}
+        params = {'l1': 1., 'l2': L, 'm1': 1., 'm2': 1. * MU / (1 - MU), 'g': 1.00}
         setup = {'t_sim': 60.0, 'fps': 30, 'slowdown': 0.25, 'oversample': 5}
         initials = dict(zip(['phi1', 'om1', 'phi2', 'om2'], U0.copy()))
-        sim = DoublePendulum(params, initials, setup)
-        time_series = double_pendulum_ode(sim)
-        return sim, time_series
+        sim = DoublePendulum(setup, params, initials)
+        sim.solve_ode()
+        return sim
 
     if event.key == 'r':  # compute intersections with multiple random initial conditions
         # plot_random_multiprocess(6, 10, list_U0)
@@ -205,14 +214,16 @@ def on_touch(event, list_U0, lines):
 
     # launch a simulation
     elif event.key == 'a' and 0 < len(list_U0):
-        sim, time_series = compute_sim(list_U0[-1].copy())
-        see_animation(sim, time_series)
+        sim = compute_sim(list_U0[-1].copy())
+        sim.animate()
     
     # display an image of the path
     elif event.key == 'd' and 0 < len(list_U0):
-        sim, time_series = compute_sim(list_U0[-1].copy())
-        x1, y1, v1, x2, y2, v2, ac2 = double_pendulum_kinematics(sim, time_series)
-        see_path_1(1.5, np.array([x2, y2]), v2, cmap='inferno')
+        sim = compute_sim(list_U0[-1].copy())
+        x2, y2, v2 = sim.full_kinematics[3:6]
+        see_path(
+            x2, y2, v2, colors='inferno'
+        )
     
     # start simulation at coordinates of the mouse
     elif event.key == 'x':
@@ -220,8 +231,8 @@ def on_touch(event, list_U0, lines):
         U0 = get_U0(phi, om)
         if U0 is None:
             return
-        sim, time_series = compute_sim(U0)
-        see_animation(sim, time_series)
+        sim = compute_sim(U0)
+        sim.animate()
 
     return
 

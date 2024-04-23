@@ -139,16 +139,21 @@ def see_path(
 
     # set background
     if bg:
-        x_bg = np.linspace(0., 1., 100)
-        y_bg = np.linspace(0., 1., 100)
+        x_bg = np.linspace(0., 1., 500)
+        y_bg = np.linspace(0., 1., 500)
         x_bg, y_bg = np.meshgrid(x_bg, y_bg)
         u_bg = 0.5*(x_bg + y_bg) - 0.15 * (x_bg**2 + y_bg**2)
-        u_bg = (u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))
+        u_bg = -0.05 + 0.25*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))
         u_bg = u_bg[::1, ::1]
-        ax.imshow(
-            u_bg, cmap=plt.get_cmap("binary_r"), origin='lower', aspect='auto',
-            interpolation='bicubic', extent=axis_bounds, vmin=0.1, vmax=5.
+        xb1, xb2, yb1, yb2 = axis_bounds
+        ax.contourf(
+            xb1+(xb2-xb1)*x_bg, yb1+(yb2-yb1)*y_bg, u_bg,
+            750, cmap="binary_r", vmin=0., vmax=1., zorder=0
         )
+        #ax.imshow(
+        #    u_bg, cmap=plt.get_cmap("binary_r"), origin='lower', aspect='auto',
+        #    interpolation='gaussian', extent=axis_bounds, vmin=0., vmax=1.
+        #)
     else:
         fig.set_facecolor("black")
 
@@ -186,9 +191,10 @@ def see_path(
 
     if save is not None and save != "no" and save != "":
         path = directoryName + save
+        #plt.show()
         print("saved at ", path)
         plt.savefig(path, transparent=False)
         plt.close(fig)
-
-    plt.show()
+    else:
+        plt.show()
     return
