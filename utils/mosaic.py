@@ -43,8 +43,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             om[s], dx[s], th[s], colors='Blues', lws=2.,
             var_case=2, figsize=figsize,
-            save=filename, displayedInfo="", 
-            icon_name="cylinder", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="cylinder", sim=sim, icon_size=(0.22, 0.18)
         )
 
     # Atwood pendulum
@@ -58,8 +58,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             om, -r, dr, colors='inferno', lws=2.,  # magma
             var_case=2, figsize=figsize,
-            save=filename, displayedInfo="", 
-            icon_name="atwood", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="atwood", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Atwood pendulum
@@ -73,8 +73,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             th, dr, r, colors='inferno', lws=1.,  # inferno
             var_case=2, figsize=figsize, pad=(0.1, 0.65),
-            save=filename, displayedInfo="", 
-            icon_name="atwood", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="atwood", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Atwood pendulum
@@ -89,8 +89,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             om, v, np.abs(om), colors='Blues', lws=1.,
             var_case=2, figsize=figsize, pad=(0.1, 0.5),
-            save=filename, displayedInfo="", 
-            icon_name="atwood", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="atwood", sim=sim, icon_size=(0.18, 0.18)
         )
     
     # Atwood pendulum
@@ -106,8 +106,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             x2, y2, v, colors='Blues_r', lws=0.5,  # jet
             var_case=2, figsize=figsize, pad=(0.1, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="atwood", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="atwood", sim=sim, icon_size=(0.18, 0.18)
         )
     
     # Double pendulum
@@ -122,8 +122,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             phi1*om1, om2, v1, colors='inferno_r', lws=1., # inferno_r
             var_case=2, figsize=figsize, pad=(0.12, 0.10),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -137,9 +137,9 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         x1, y1, v1, x2, y2, v2 = sim.full_kinematics[:6]
         display.see_path(
             phi1, phi2*om1, phi2, colors='Reds', lws=1.,
-            var_case=2, figsize=figsize, pad=(0.12, 0.10),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            var_case=2, figsize=figsize, pad=(0.14, 0.10),
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -154,8 +154,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             phi1*om2, phi2*om1, v1*v2, colors='Reds', lws=1.,
             var_case=2, figsize=figsize, pad=(0.20, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -170,8 +170,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
         display.see_path(
             om1, om2, v2, colors='Reds', lws=2.,
             var_case=2, figsize=figsize, pad=(0.15, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
     
     # Double pendulum
@@ -187,8 +187,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             [phi1, phi2], [om2, om1], [v1, v2], 
             colors="inferno", lws=1.,  # inferno
             var_case=2, figsize=figsize, pad=(0.15, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -204,8 +204,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             [phi1, phi2], [om1, om2], [phi2, phi1], 
             colors=["Reds", "Reds_r"], lws=1.,
             var_case=2, figsize=figsize, pad=(0.15, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -222,9 +222,9 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             [5  *om2**2-0.5, 1.25*np.abs(-0.75+np.abs(om2+1))],
             [om2*phi1, phi2], 
             colors=["turbo_r", "turbo"], lws=1.,  # turbo_r, turbo
-            var_case=2, figsize=figsize, pad=(0.25, 0.25, 0.35, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            var_case=2, figsize=figsize, pad=(0.25, 0.25, 0.30, 0.20),
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Double pendulum
@@ -240,8 +240,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             x2, y2, v2, 
             colors="turbo", lws=1.,  # jet
             var_case=1, figsize=figsize, pad=(0.15, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="double pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="double pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Driven pendulum
@@ -257,8 +257,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             x2, y2, v2, 
             colors="jet", lws=1.,  # jet
             var_case=1, figsize=figsize, pad=(0.05, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="driven pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="driven pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Driven pendulum
@@ -274,8 +274,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             x2, y2, v2, 
             colors="Blues", lws=1.,
             var_case=1, figsize=figsize, pad=(0.15, 0.15),
-            save=filename, displayedInfo="", 
-            icon_name="driven pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="driven pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Horizontal pendulum
@@ -291,8 +291,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             -om, dx, vp, 
             colors="Reds", lws=1.,  # Spectral
             var_case=2, figsize=figsize, pad=(0.15, 0.20),
-            save=filename, displayedInfo="", 
-            icon_name="horizontal pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="horizontal pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Horizontal pendulum
@@ -308,8 +308,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             th, dx, np.abs(om), 
             colors="Blues_r", lws=1.,
             var_case=2, figsize=figsize, pad=(0.15, 0.20),
-            save=filename, displayedInfo="", 
-            icon_name="horizontal pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="horizontal pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     # Triple pendulum
@@ -326,8 +326,8 @@ def generate_figures(i=0, figsize=(10., 10.), bg="gradient", save=False):
             x3, y3, v3, 
             colors="jet", lws=3.,  # jet
             var_case=1, figsize=figsize, pad=(0.15, 0.20),
-            save=filename, displayedInfo="", 
-            icon_name="triple pendulum", sim=sim, bg=bg
+            save=filename, displayedInfo="", bg=bg,
+            icon_name="triple pendulum", sim=sim, icon_size=(0.18, 0.18)
         )
 
     return
@@ -376,6 +376,11 @@ def merge_images():
 
 
 if __name__ == "__main__":
-    generate_figures(0, figsize=(20., 20.), bg=True, save=True)
-    merge_images()
+    
+    # generate_figures(13, figsize=(20., 20.), bg=True, save=True)
+    # generate_figures(6, figsize=(20., 20.), bg=True, save=True)
+    # generate_figures(10, figsize=(20., 20.), bg=True, save=True)
+    generate_figures(3, figsize=(20., 20.), bg=False, save=True)
+    # generate_figures(0, figsize=(10., 10.), bg=False, save=True)
+    # merge_images()
     

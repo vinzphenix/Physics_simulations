@@ -60,8 +60,8 @@ def see_path(
         vars_x, vars_y, vars_c, 
         figsize=(10., 6.), var_case=2,
         lws=1., colors=None, shifts=None, pad=None,
-        displayedInfo=None, icon_name=None, sim=None,
-        bg=None, name='Figure_1', save=None,
+        icon_name=None, sim=None, icon_size=(0.18, 0.18),
+        displayedInfo=None, bg=None, name='Figure_1', save=None,
     ):
 
     n_plots = len(vars_x)
@@ -142,8 +142,10 @@ def see_path(
         x_bg = np.linspace(0., 1., 500)
         y_bg = np.linspace(0., 1., 500)
         x_bg, y_bg = np.meshgrid(x_bg, y_bg)
-        u_bg = 0.5*(x_bg + y_bg) - 0.15 * (x_bg**2 + y_bg**2)
-        u_bg = -0.05 + 0.25*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))
+        u_bg = 0.5*(x_bg + y_bg) - 0. * (x_bg**2 + y_bg**2)
+        # u_bg = 0.5 + 0.50*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 1
+        # u_bg = 0.0 + 0.8*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 2
+        u_bg = -0.05 + 0.35*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 3
         u_bg = u_bg[::1, ::1]
         xb1, xb2, yb1, yb2 = axis_bounds
         ax.contourf(
@@ -176,7 +178,8 @@ def see_path(
         textbox.set_bbox(dict(facecolor='white', edgecolor=None, alpha=0.25))
 
     if icon_name is not None and sim is not None:
-        draw_icon(ax, icon_name, sim, 0.20, 0.20, 0.04)
+        color_light = (0.75, 0.75, 0.75, 1.0)
+        draw_icon(ax, icon_name, sim, *icon_size, 0.05, color_light, 1.5)
 
     # if save == "save" or save == "erase":
     #     new_number = 0

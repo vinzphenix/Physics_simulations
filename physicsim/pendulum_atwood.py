@@ -30,7 +30,7 @@ class AtwoodPendulum(Simulation):
         r, dr, th, om = self.full_series
 
         d = np.mean(r)
-        L = max(r) + d * 1.2
+        L = max(r) + d * 1.25
         self.d = d  # used for icon
         self.L = L  # used for icon
 

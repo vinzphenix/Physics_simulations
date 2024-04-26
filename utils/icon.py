@@ -138,9 +138,16 @@ def map_xy(x, y, ax, shift_x, shift_y, scale_x, scale_y, pad_x, pad_y):
     xnew = ax_xmax + (ax_xmax - ax_xmin) * ((x - shift_x) * scale_x - pad_x)
     ynew = ax_ymin + (ax_ymax - ax_ymin) * ((y - shift_y) * scale_y + pad_y)
     return xnew, ynew
+
+
+def get_color_palette(c1):
+    # c1 : moving points
+    c2 = tuple(np.r_[0.85*np.array(c1)[:3], c1[3]])  # segments
+    c3 = tuple(np.r_[0.65*np.array(c1)[:3], c1[3]])  # fixed points
+    c4 = tuple(np.r_[0.85*np.array(c1)[:3], 0.85*c1[3]])  # arrows
+    return c2, c3, c4
     
-    
-def icon_double_pendulum(ax, sim, fx, fy, pad, color, driven=False):
+def icon_dbl_pendulum(ax, sim, fx, fy, pad, c1, lw, driven=False):
     l1, l2 = sim.l1, sim.l2
     if not driven:
         m1, m2 = sim.m1, sim.m2
@@ -179,17 +186,22 @@ def icon_double_pendulum(ax, sim, fx, fy, pad, color, driven=False):
     x1, y1 = map_xy(x1, y1, *args)
     x2, y2 = map_xy(x2, y2, *args)
     x3, y3 = map_xy(x3, y3, *args)
-        
+    
+    c2, c3, c4 = get_color_palette(c1)
     ls = ':' if driven else '-'
     ms = 15*(0.1*max(w_disp, h_disp))
-    ax.plot([ox], [oy], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # center
-    ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(m1/(m1+m2+m3)), color=color, zorder=1) # node 1
-    ax.plot([x2], [y2], 'o', ms=ms*np.sqrt(m2/(m1+m2+m3)), color=color, zorder=1) # node 2
-    ax.plot([ox, x1], [oy, y1], ls=ls, lw=2, color=color, alpha=0.8, zorder=0) # segment 1
-    ax.plot([x1, x2], [y1, y2], '-', lw=2, color=color, alpha=0.8, zorder=0) # segment 2
+    LW = lw * (0.1*max(w_disp, h_disp))
+    ax.plot(
+        [ox], [oy], 's', ms=ms*np.sqrt(0.5),
+        markerfacecolor=c3, markeredgecolor="none", zorder=2
+    ) # center
+    ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(m1/(m1+m2+m3)), color=c1, zorder=1) # node 1
+    ax.plot([x2], [y2], 'o', ms=ms*np.sqrt(m2/(m1+m2+m3)), color=c1, zorder=1) # node 2
+    ax.plot([ox, x1], [oy, y1], ls=ls, lw=LW, color=c2, zorder=0) # segment 1
+    ax.plot([x1, x2], [y1, y2], '-', lw=LW, color=c2, zorder=0) # segment 2
     if l3 > 0.:
-        ax.plot([x2, x3], [y2, y3], '-', lw=2, color=color, alpha=0.8, zorder=0)
-        ax.plot([x3], [y3], 'o', ms=ms*np.sqrt(m3/(m1+m2+m3)), color=color, zorder=1)
+        ax.plot([x3], [y3], 'o', ms=ms*np.sqrt(m3/(m1+m2+m3)), color=c1, zorder=1)
+        ax.plot([x2, x3], [y2, y3], '-', lw=LW, color=c2, zorder=0)
     
     for i, (org, dst, om) in enumerate(zip(orgs, dsts, oms)):
         if (i == 2) and l3 < 0.:
@@ -199,13 +211,13 @@ def icon_double_pendulum(ax, sim, fx, fy, pad, color, driven=False):
         arrow_pts, arrow_head = get_curved_arrow(org, dst, arrow_r, strength)
         a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
         arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-        ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=color, alpha=0.5)
-        ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+        ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=c4)
+        ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
         
     return
 
 
-def icon_atwood(ax, sim, fx, fy, pad, color):
+def icon_atwood(ax, sim, fx, fy, pad, c1, lw):
     M, m, d, L = sim.M, sim.m, sim.d, sim.L
     r0, v0, th0, om0 = sim.r, sim.dr, sim.th, sim.om
     w_disp, h_disp = get_display(ax)
@@ -229,12 +241,29 @@ def icon_atwood(ax, sim, fx, fy, pad, color):
     x2, y2 = map_xy(x2, y2, *args)
     x3, y3 = map_xy(x3, y3, *args)
     
-    ms = 15*(0.1*max(w_disp, h_disp))
-    ax.plot([x0], [y0], 'o', ms=ms*np.sqrt(M/(m+M)), color=color, zorder=1) # big mass
-    ax.plot([x1], [y1], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
-    ax.plot([x2], [y2], 's', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # node
-    ax.plot([x3], [y3], 'o', ms=ms*np.sqrt(m/(m+M)), color=color, zorder=1) # small mass
-    ax.plot([x0, x1, x2, x3], [y0, y1, y2, y3], '-', lw=2, color=color, alpha=0.8, zorder=0) # segment 1
+    c2, c3, c4 = get_color_palette(c1)
+    ms = 12*(0.1*max(w_disp, h_disp))
+    LW = lw * (0.1*max(w_disp, h_disp))
+    ax.plot(
+        [x0], [y0], 'o', ms=ms*np.sqrt(M/(m+M)), zorder=1, 
+        markerfacecolor=c1, markeredgecolor="none"
+    ) # big mass
+    ax.plot(
+        [x1], [y1], 's', ms=ms*np.sqrt(0.5), zorder=1, 
+        markerfacecolor=c3, markeredgecolor="none"
+    ) # node
+    ax.plot(
+        [x2], [y2], 's', ms=ms*np.sqrt(0.5), zorder=1, 
+        markerfacecolor=c3,  markeredgecolor="none"
+    ) # node
+    ax.plot(
+        [x3], [y3], 'o', ms=ms*np.sqrt(m/(m+M)), zorder=1, 
+        markerfacecolor=c1, markeredgecolor="none"
+    ) # small mass
+    ax.plot(
+        [x0, x1, x2, x3], [y0, y1, y2, y3], '-', lw=LW, 
+        color=c2, zorder=0
+    ) # segment 1
     
     org, dst, om = orgs[0], dsts[0], oms[0]
     strength = 0.15*om
@@ -242,19 +271,19 @@ def icon_atwood(ax, sim, fx, fy, pad, color):
     arrow_pts, arrow_head = get_curved_arrow(org, dst, arrow_r, strength)
     a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-    ax.plot(arrow_pts_x, arrow_pts_y, color=color, alpha=0.5)
-    ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+    ax.plot(arrow_pts_x, arrow_pts_y, color=c4)
+    ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
     
     org, dst, om = orgs[1], dsts[1], oms[1]
     arrow_pts, arrow_head = get_straight_arrow(org, dst, v0)
     a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-    ax.plot(arrow_pts_x, arrow_pts_y, color=color, alpha=0.5)
-    ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+    ax.plot(arrow_pts_x, arrow_pts_y, color=c4)
+    ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
     return
     
 
-def icon_moving_pendulum(ax, sim, fx, fy, pad, color, vertical=True):
+def icon_mv_pendulum(ax, sim, fx, fy, pad, c1, lw, vertical=True):
     l, m, M, F, w = sim.l, sim.mp, sim.mb, sim.F, sim.w
     phi0, om0, x0, v0 = sim.phi, sim.om, sim.x, sim.dx
     w_disp, h_disp = get_display(ax)
@@ -288,41 +317,46 @@ def icon_moving_pendulum(ax, sim, fx, fy, pad, color, vertical=True):
     x4, y4 = map_xy(x4, y4, *args)
     x5, y5 = map_xy(x5, y5, *args)
 
-    ms = 15*(0.1*max(w_disp, h_disp))
-    ax.plot([ox], [oy], 'o', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # center
-    ax.plot([x1], [y1], 'o', ms=2*ms*np.sqrt(m/(m+M)), color=color, zorder=1) # node 1
-    ax.plot([ox, x1], [oy, y1], ls='-', lw=2, color=color, alpha=0.8, zorder=0) # segment 1
-    ax.fill([x2, x3, x4, x5], [y2, y3, y4, y5], color=color, edgecolor='none', alpha=0.5)
+    c2, c3, c4 = get_color_palette(c1)
+    ms = 8*(0.1*max(w_disp, h_disp))
+    LW = lw * (0.1*max(w_disp, h_disp))
+    ax.plot(
+        [ox], [oy], 'o', ms=ms*np.sqrt(0.5), color=c1,
+        zorder=1, markerfacecolor=c3, markeredgecolor="none"
+    ) # center
+    ax.plot([x1], [y1], 'o', ms=2*ms*np.sqrt(m/(m+M)), color=c1, zorder=1) # node 1
+    ax.plot([ox, x1], [oy, y1], ls='-', lw=LW, color=c2, zorder=0) # segment 1
+    ax.fill([x2, x3, x4, x5], [y2, y3, y4, y5], color=c3, edgecolor='none')
 
     org, dst, om = orgs[0], dsts[0], oms[0]
-    strength = 0.15*om
+    strength = 0.10*om
     arrow_r = l
     arrow_pts, arrow_head = get_curved_arrow(org, dst, arrow_r, strength)
     a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-    ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=color, alpha=0.5)
-    ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+    ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=c4)
+    ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
     
     org, dst, om = orgs[1], dsts[1], oms[1]
     arrow_pts, arrow_head = get_straight_arrow(org, dst, v0)
     a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-    ax.plot(arrow_pts_x, arrow_pts_y, color=color, alpha=0.5)
-    ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+    ax.plot(arrow_pts_x, arrow_pts_y, color=c4)
+    ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
 
     org, dst = orgs[2], dsts[2]
     arrow_pts, arrow_head, arrow_tail = get_double_straight_arrow(org, dst)
     # ws(arrow_pts, arrow_head, arrow_tail)
     arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-    ax.plot(arrow_pts_x, arrow_pts_y, color=color, alpha=0.5)
+    ax.plot(arrow_pts_x, arrow_pts_y, color=c4)
     for arrow in [arrow_head, arrow_tail]:
         a_head_x, a_head_y = map_xy(arrow[:, 0], arrow[:, 1], *args)
-        ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+        ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
     
     return
 
 
-def icon_cylinder(ax, sim, fx, fy, pad, color):
+def icon_cylinder(ax, sim, fx, fy, pad, c1, lw):
     C, a, m, M, R, L = sim.C, sim.alpha, sim.m, sim.M, sim.R, sim.L
     th0, om0, x0, v0 = sim.th, sim.om, sim.x, sim.dx
     w_disp, h_disp = get_display(ax)
@@ -365,26 +399,34 @@ def icon_cylinder(ax, sim, fx, fy, pad, color):
     x5, y5 = map_xy(x5, y5, *args)
     x6, y6 = map_xy(x6, y6, *args)
     circ_x, circ_y = map_xy(circ_x, circ_y, *args)
-        
-    ms = 15*(0.1*max(w_disp, h_disp))
-    ax.plot([ox], [oy], 'o', ms=ms*np.sqrt(0.5), color=color, zorder=1, markerfacecolor='white') # center
-    ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(m/(m+M)), color=color, zorder=1) # node 1
-    ax.plot([ox, x1], [oy, y1], ls='-', lw=2, color=color, alpha=0.8, zorder=0) # rod
-    ax.plot([x2, x3], [y2, y3], ls='-', lw=2, color=color, alpha=0.8, zorder=0) # slope
+    
+    c2, c3, c4 = get_color_palette(c1)
+    ms = 15 * (0.1*max(w_disp, h_disp))
+    LW = lw * (0.1*max(w_disp, h_disp))
+    ax.fill(circ_x, circ_y, color=c2, edgecolor='none', zorder=0, alpha=0.35) # disk
+    ax.plot(
+        [ox], [oy], 'o', ms=ms*np.sqrt(0.5), zorder=1, 
+        markerfacecolor=c3, markeredgecolor="none"
+    ) # center
+    ax.plot([x1], [y1], 'o', ms=ms*np.sqrt(m/(m+M)), color=c1, zorder=1) # node 1
+    ax.plot([ox, x1], [oy, y1], ls='-', lw=LW, color=c2, zorder=0) # rod
+    ax.plot([x2, x3], [y2, y3], ls='-', lw=LW, color=c3, zorder=0) # slope
     # ax.fill([x2, x3, x4], [y2, y3, y4], ls='-', lw=2, color=color, alpha=0.5, edgecolor='none') # slope
-    ax.fill(circ_x, circ_y, color=color, edgecolor='none', alpha=0.5) # disk
     
     for i, (org, dst, om, rad) in enumerate(zip(orgs, dsts, oms, rads)):
         strength = 0.10*om
         arrow_pts, arrow_head = get_curved_arrow(org, dst, rad, strength, head_pct=0.20)
         a_head_x, a_head_y = map_xy(arrow_head[:, 0], arrow_head[:, 1], *args)
         arrow_pts_x, arrow_pts_y = map_xy(arrow_pts[:, 0], arrow_pts[:, 1], *args)
-        ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=color, alpha=0.5)
-        ax.fill(a_head_x, a_head_y, color=color, edgecolor='none', alpha=0.5)
+        ax.plot(arrow_pts_x, arrow_pts_y, ls='-', color=c4)
+        ax.fill(a_head_x, a_head_y, color=c4, edgecolor='none')
         
     return
 
-def draw_icon(ax, name, sim, fraction_x=0.15, fraction_y=0.15, pad=0.02, color="lightgrey"):
+def draw_icon(
+    ax, name, sim, fraction_x=0.15, fraction_y=0.15, 
+    pad=0.02, c_light="lightgrey", lw=2
+    ):
     """
     fraction indicates the maximum width of the logo as a % of full figure width
     """
@@ -393,19 +435,19 @@ def draw_icon(ax, name, sim, fraction_x=0.15, fraction_y=0.15, pad=0.02, color="
     ax.set_ylim(ax.get_ylim())
 
     if name == "double pendulum":
-        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color)
+        icon_dbl_pendulum(ax, sim, fraction_x, fraction_y, pad, c_light, lw)
     elif name == "triple pendulum":
-        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color)
+        icon_dbl_pendulum(ax, sim, fraction_x, fraction_y, pad, c_light, lw)
     elif name == "driven pendulum":
-        icon_double_pendulum(ax, sim, fraction_x, fraction_y, pad, color, driven=True)
+        icon_dbl_pendulum(ax, sim, fraction_x, fraction_y, pad, c_light, lw, driven=True)
     elif name == "atwood":
-        icon_atwood(ax, sim, fraction_x, fraction_y, pad, color)
+        icon_atwood(ax, sim, fraction_x, fraction_y, pad, c_light, lw)
     elif name == "vertical pendulum":
-        icon_moving_pendulum(ax, sim, fraction_x, fraction_y, pad, color, vertical=True)
+        icon_mv_pendulum(ax, sim, fraction_x, fraction_y, pad, c_light, lw, vertical=True)
     elif name == "horizontal pendulum":
-        icon_moving_pendulum(ax, sim, fraction_x, fraction_y, pad, color, vertical=False)
+        icon_mv_pendulum(ax, sim, fraction_x, fraction_y, pad, c_light, lw, vertical=False)
     elif name == "cylinder":
-        icon_cylinder(ax, sim, fraction_x, fraction_y, pad, color)
+        icon_cylinder(ax, sim, fraction_x, fraction_y, pad, c_light, lw)
 
     return
 
