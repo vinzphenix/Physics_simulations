@@ -95,7 +95,7 @@ def see_path(
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     # fig.set_facecolor("lightgrey")
     infoPosition, infoHeight, infoSize = 0.975, 0.5, 11
-    fig.canvas.set_window_title(name)
+    fig.canvas.manager.set_window_title(name)
 
     x_min, x_max, y_min, y_max = np.inf, -np.inf, np.inf, -np.inf
     for var_x, var_y, var_c in zip(vars_x, vars_y, vars_c):

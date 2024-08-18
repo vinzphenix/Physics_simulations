@@ -95,6 +95,6 @@ if __name__ == "__main__":
 
     sim = atwood.AtwoodPendulum(setup, params, initials)
     sim.solve_ode()
-    sim.animate(save="no")
+    #sim.animate(save="no")
 
-    # display(sim)
+    display(sim)
