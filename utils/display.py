@@ -142,10 +142,11 @@ def see_path(
         x_bg = np.linspace(0., 1., 500)
         y_bg = np.linspace(0., 1., 500)
         x_bg, y_bg = np.meshgrid(x_bg, y_bg)
-        u_bg = 0.5*(x_bg + y_bg) - 0. * (x_bg**2 + y_bg**2)
+        # u_bg = 0.5*(-x_bg + y_bg) - 0. * (x_bg**2 + y_bg**2)
+        u_bg = -((2.-x_bg) ** 2 + (1.75-y_bg) ** 2)
         # u_bg = 0.5 + 0.50*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 1
         # u_bg = 0.0 + 0.8*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 2
-        u_bg = -0.05 + 0.35*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 3
+        u_bg = -0.05 + 0.15*(u_bg - np.amin(u_bg)) / (np.amax(u_bg) - np.amin(u_bg))  # shading 3
         u_bg = u_bg[::1, ::1]
         xb1, xb2, yb1, yb2 = axis_bounds
         ax.contourf(
